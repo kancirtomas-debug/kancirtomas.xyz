@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulačka Podláh | GEEL - Stavebné práce Prešov</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        geel: {
+                            primary: '#8B5A2B',
+                            secondary: '#F5F5DC',
+                            accent: '#D4A574',
+                            dark: '#333333',
+                            light: '#FAF8F5',
+                            wood: '#6B4423',
+                            cream: '#FFF8E7'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Open Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Floor type card selection */
+        input[type="radio"]:checked + div {
+            border-color: #8B5A2B;
+            background: linear-gradient(135deg, #FFF8E7 0%, #F5F5DC 100%);
+            box-shadow: 0 8px 25px -5px rgba(139, 90, 43, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        input[type="radio"]:checked + div .floor-icon {
+            background-color: #8B5A2B;
+            color: white;
+        }
+        
+        input[type="radio"]:checked + div .check-badge {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* Custom range slider */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            background: linear-gradient(to right, #8B5A2B 0%, #D4A574 100%);
+            border-radius: 4px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #8B5A2B;
+            border: 4px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(139, 90, 43, 0.4);
+            transition: all 0.2s ease;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(139, 90, 43, 0.5);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: #8B5A2B;
+            border: 4px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(139, 90, 43, 0.4);
+        }
+        
+        /* Custom checkbox */
+        .custom-checkbox {
+            position: relative;
+            padding-left: 35px;
+            cursor: pointer;
+        }
+        
+        .custom-checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        
+        .checkmark {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            height: 24px;
+            width: 24px;
+            background-color: #fff;
+            border: 2px solid #D4A574;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .custom-checkbox:hover .checkmark {
+            border-color: #8B5A2B;
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark {
+            background-color: #8B5A2B;
+            border-color: #8B5A2B;
+        }
+        
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 7px;
+            top: 3px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark:after {
+            display: block;
+        }
+        
+        /* Wood grain pattern overlay */
+        .wood-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20 Q 25 15, 50 20 T 100 20' stroke='%23D4A574' stroke-width='0.5' fill='none' opacity='0.3'/%3E%3Cpath d='M0 40 Q 25 35, 50 40 T 100 40' stroke='%23D4A574' stroke-width='0.5' fill='none' opacity='0.3'/%3E%3Cpath d='M0 60 Q 25 55, 50 60 T 100 60' stroke='%23D4A574' stroke-width='0.5' fill='none' opacity='0.3'/%3E%3Cpath d='M0 80 Q 25 75, 50 80 T 100 80' stroke='%23D4A574' stroke-width='0.5' fill='none' opacity='0.3'/%3E%3C/svg%3E");
+        }
+        
+        /* Result cards */
+        .result-card {
+            background: linear-gradient(135deg, #ffffff 0%, #FAF8F5 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px -10px rgba(139, 90, 43, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-geel-light font-sans text-geel-dark">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="https://geel.sk" class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-geel-primary rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-hammer text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-2xl text-geel-primary tracking-tight">GEEL</span>
+                        <span class="hidden sm:inline text-sm text-gray-500 ml-2">Stavebné práce</span>
+                    </div>
+                </a>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="https://geel.sk/referencie/" class="text-gray-600 hover:text-geel-primary transition font-medium">Referencie</a>
+                    <a href="https://geel.sk/sluzby/" class="text-gray-600 hover:text-geel-primary transition font-medium">Služby</a>
+                    <a href="#" class="text-geel-primary font-semibold border-b-2 border-geel-primary pb-1">Kalkulačka</a>
+                    <a href="https://geel.sk/kontakt/" class="bg-geel-primary text-white px-5 py-2 rounded-lg font-semibold hover:bg-geel-wood transition shadow-md">
+                        <i class="fa-solid fa-phone mr-2"></i>Kontakt
+                    </a>
+                </nav>
+                <button class="md:hidden text-geel-primary text-2xl">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-geel-secondary via-geel-cream to-geel-light py-12 wood-pattern">
+        <div class="container mx-auto px-4 text-center">
+            <div class="inline-flex items-center bg-white/80 backdrop-blur px-4 py-2 rounded-full text-sm text-geel-wood font-medium mb-6 shadow-sm">
+                <i class="fa-solid fa-calculator mr-2"></i>
+                Online nástroj pre rýchly odhad
+            </div>
+            <h1 class="text-3xl md:text-5xl font-bold text-geel-dark mb-4">
+                Kalkulačka <span class="text-geel-primary">podlahových</span> prác
+            </h1>
+            <p class="text-gray-600 max-w-2xl mx-auto text-lg">
+                Zistite orientačnú cenu položenia novej podlahy vo vašom byte alebo dome. 
+                Stačí zadať plochu a vybrať typ podlahy.
+            </p>
+        </div>
+    </section>
+
+    <!-- Calculator Section -->
+    <main class="container mx-auto px-4 py-10 max-w-4xl">
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            
+            <!-- Progress indicator -->
+            <div class="bg-geel-secondary px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center space-x-2 text-geel-wood">
+                    <i class="fa-solid fa-ruler-combined"></i>
+                    <span class="font-semibold">Konfigurátor podlahy</span>
+                </div>
+                <div class="text-sm text-geel-primary font-medium">
+                    <i class="fa-solid fa-clock mr-1"></i> Hotové za 30 sekúnd
+                </div>
+            </div>
+
+            <form id="floorCalcForm" class="p-6 md:p-8">
+                
+                <!-- Step 1: Area -->
+                <div class="mb-10">
+                    <div class="flex items-center mb-5">
+                        <div class="w-8 h-8 bg-geel-primary text-white rounded-full flex items-center justify-center font-bold text-sm mr-3">1</div>
+                        <h3 class="text-xl font-bold text-geel-dark">Aká je plocha miestnosti?</h3>
+                    </div>
+                    
+                    <div class="bg-geel-light rounded-xl p-6 border border-geel-secondary">
+                        <div class="flex flex-col md:flex-row md:items-center gap-4">
+                            <div class="flex-1">
+                                <label for="area" class="block text-sm font-medium text-gray-600 mb-2">
+                                    Zadajte plochu v m²
+                                </label>
+                                <div class="relative">
+                                    <input 
+                                        type="number" 
+                                        id="area" 
+                                        name="area" 
+                                        min="1" 
+                                        max="500" 
+                                        value="25"
+                                        class="w-full text-3xl font-bold text-geel-dark bg-white border-2 border-geel-accent/30 rounded-xl px-5 py-4 focus:border-geel-primary focus:ring-4 focus:ring-geel-primary/10 outline-none transition"
+                                        oninput="calculatePrice()"
+                                    >
+                                    <span class="absolute right-5 top-1/2 -translate-y-1/2 text-xl font-semibold text-geel-accent">m²</span>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 border border-dashed border-geel-accent/50 text-center md:w-48">
+                                <i class="fa-solid fa-lightbulb text-geel-accent text-2xl mb-2"></i>
+                                <p class="text-xs text-gray-500">Tip: Štandardná izba má približne 15-20 m²</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Floor Type -->
+                <div class="mb-10">
+                    <div class="flex items-center mb-5">
+                        <div class="w-8 h-8 bg-geel-primary text-white rounded-full flex items-center justify-center font-bold text-sm mr-3">2</div>
+                        <h3 class="text-xl font-bold text-geel-dark">Vyberte typ podlahy</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <!-- Laminát -->
+                        <label class="cursor-pointer">
+                            <input type="radio" name="floorType" value="laminat" data-material="15" data-labor="10" class="hidden" checked>
+                            <div class="border-2 border-gray-200 rounded-xl p-5 text-center transition-all duration-300 hover:border-geel-accent relative">
+                                <div class="check-badge absolute -top-2 -right-2 w-7 h-7 bg-geel-primary rounded-full flex items-center justify-center opacity-0 transform scale-0 transition-all duration-300">
+                                    <i class="fa-solid fa-check text-white text-xs"></i>
+                                </div>
+                                <div class="floor-icon w-16 h-16 bg-geel-secondary rounded-full flex items-center justify-center mx-auto mb-4 transition-all duration-300">
+                                    <i class="fa-solid fa-layer-group text-2xl text-geel-primary"></i>
+                                </div>
+                                <h4 class="font-bold text-lg text-geel-dark mb-1">Laminát</h4>
+                                <p class="text-xs text-gray-500 mb-3">Cenovo dostupné riešenie</p>
+                                <div class="bg-geel-light rounded-lg py-2 px-3">
+                                    <span class="text-geel-primary font-bold">15€</span>
+                                    <span class="text-gray-500 text-sm">/m² materiál</span>
+                                </div>
+                                <div class="text-xs text-gray-400 mt-2">+ 10€/m² práca</div>
+                            </div>
+                        </label>
+
+                        <!-- Vinyl Click -->
+                        <label class="cursor-pointer">
+                            <input type="radio" name="floorType" value="vinyl" data-material="25" data-labor="12" class="hidden">
+                            <div class="border-2 border-gray-200 rounded-xl p-5 text-center transition-all duration-300 hover:border-geel-accent relative">
+                                <div class="check-badge absolute -top-2 -right-2 w-7 h-7 bg-geel-primary rounded-full flex items-center justify-center opacity-0 transform scale-0 transition-all duration-300">
+                                    <i class="fa-solid fa-check text-white text-xs"></i>
+                                </div>
+                                <div class="floor-icon w-16 h-16 bg-geel-secondary rounded-full flex items-center justify-center mx-auto mb-4 transition-all duration-300">
+                                    <i class="fa-solid fa-water text-2xl text-geel-primary"></i>
+                                </div>
+                                <h4 class="font-bold text-lg text-geel-dark mb-1">Vinyl Click</h4>
+                                <p class="text-xs text-gray-500 mb-3">Vodoodolný, tichý</p>
+                                <div class="bg-geel-light rounded-lg py-2 px-3">
+                                    <span class="text-geel-primary font-bold">25€</span>
+                                    <span class="text-gray-500 text-sm">/m² materiál</span>
+                                </div>
+                                <div class="text-xs text-gray-400 mt-2">+ 12€/m² práca</div>
+                            </div>
+                        </label>
+
+                        <!-- Drevená podlaha -->
+                        <label class="cursor-pointer">
+                            <input type="radio" name="floorType" value="drevo" data-material="50" data-labor="18" class="hidden">
+                            <div class="border-2 border-gray-200 rounded-xl p-5 text-center transition-all duration-300 hover:border-geel-accent relative">
+                                <div class="check-badge absolute -top-2 -right-2 w-7 h-7 bg-geel-primary rounded-full flex items-center justify-center opacity-0 transform scale-0 transition-all duration-300">
+                                    <i class="fa-solid fa-check text-white text-xs"></i>
+                                </div>
+                                <div class="floor-icon w-16 h-16 bg-geel-secondary rounded-full flex items-center justify-center mx-auto mb-4 transition-all duration-300">
+                                    <i class="fa-solid fa-tree text-2xl text-geel-primary"></i>
+                                </div>
+                                <h4 class="font-bold text-lg text-geel-dark mb-1">Drevená podlaha</h4>
+                                <p class="text-xs text-gray-500 mb-3">Prémiová kvalita</p>
+                                <div class="bg-geel-light rounded-lg py-2 px-3">
+                                    <span class="text-geel-primary font-bold">50€</span>
+                                    <span class="text-gray-500 text-sm">/m² materiál</span>
+                                </div>
+                                <div class="text-xs text-gray-400 mt-2">+ 18€/m² práca</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Step 3: Waste Slider -->
+                <div class="mb-10">
+                    <div class="flex items-center mb-5">
+                        <div class="w-8 h-8 bg-geel-primary text-white rounded-full flex items-center justify-center font-bold text-sm mr-3">3</div>
+                        <h3 class="text-xl font-bold text-geel-dark">Rezerva na prerez (odpad)</h3>
+                    </div>
+                    
+                    <div class="bg-geel-light rounded-xl p-6 border border-geel-secondary">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <i class="fa-solid fa-scissors text-geel-accent mr-3 text-lg"></i>
+                                <span class="text-gray-600">Odporúčame 10% pre štandardné miestnosti</span>
+                            </div>
+                            <div class="bg-geel-primary text-white px-4 py-2 rounded-lg font-bold text-lg min-w-[80px] text-center">
+                                <span id="wasteValue">10</span>%
+                            </div>
+                        </div>
+                        <input 
+                            type="range" 
+                            id="wasteSlider" 
+                            name="waste" 
+                            min="0" 
+                            max="15" 
+                            value="10" 
+                            class="w-full"
+                            oninput="updateWaste(); calculatePrice();"
+                        >
+                        <div class="flex justify-between text-xs text-gray-400 mt-2">
+                            <span>0% (žiadna rezerva)</span>
+                            <span>15% (zložitý pôdorys)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Leveling Checkbox -->
+                <div class="mb-10">
+                    <div class="flex items-center mb-5">
+                        <div class="w-8 h-8 bg-geel-primary text-white rounded-full flex items-center justify-center font-bold text-sm mr-3">4</div>
+                        <h3 class="text-xl font-bold text-geel-dark">Doplnkové služby</h3>
+                    </div>
+                    
+                    <div class="bg-white border-2 border-geel-secondary rounded-xl p-5 hover:border-geel-accent transition cursor-pointer" onclick="document.getElementById('leveling').click();">
+                        <label class="custom-checkbox flex items-center cursor-pointer">
+                            <input type="checkbox" id="leveling" name="leveling" value="10" onchange="calculatePrice()">
+                            <span class="checkmark"></span>
+                            <div class="ml-3">
+                                <div class="flex items-center">
+                                    <i class="fa-solid fa-ruler-horizontal text-geel-accent mr-3 text-lg"></i>
+                                    <span class="font-semibold text-geel-dark">Nivelácia podkladu</span>
+                                    <span class="ml-3 bg-geel-accent/20 text-geel-wood px-2 py-1 rounded text-xs font-bold">+10€/m²</span>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1 ml-8">Vyrovnanie nerovností podlahy nivelačnou hmotou</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Calculate Button -->
+                <button 
+                    type="button" 
+                    onclick="calculatePrice(); showResults();"
+                    class="w-full bg-gradient-to-r from-geel-primary to-geel-wood text-white text-xl font-bold py-5 rounded-xl shadow-lg transition transform hover:-translate-y-1 hover:shadow-xl flex items-center justify-center"
+                >
+                    <i class="fa-solid fa-calculator mr-3"></i>
+                    Vypočítať cenu
+                </button>
+            </form>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="hidden border-t border-gray-100">
+                <div class="bg-gradient-to-br from-geel-secondary to-geel-cream p-6 md:p-8 fade-in">
+                    <div class="text-center mb-8">
+                        <div class="inline-flex items-center bg-white px-4 py-2 rounded-full text-sm text-geel-primary font-semibold mb-4 shadow-sm">
+                            <i class="fa-solid fa-check-circle mr-2"></i>
+                            Orientačná kalkulácia
+                        </div>
+                        <h3 class="text-2xl font-bold text-geel-dark">Váš odhad nákladov</h3>
+                    </div>
+
+                    <!-- Result Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+                        <!-- Material Cost -->
+                        <div class="result-card rounded-xl p-5 border border-geel-accent/20 shadow-md">
+                            <div class="flex items-center mb-3">
+                                <div class="w-10 h-10 bg-geel-secondary rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-box-open text-geel-primary"></i>
+                                </div>
+                                <span class="text-gray-600 font-medium">Materiál</span>
+                            </div>
+                            <div class="text-3xl font-bold text-geel-dark" id="materialCost">0 €</div>
+                            <div class="text-xs text-gray-400 mt-1">vrátane <span id="materialArea">0</span> m² (s rezervou)</div>
+                        </div>
+
+                        <!-- Labor Cost -->
+                        <div class="result-card rounded-xl p-5 border border-geel-accent/20 shadow-md">
+                            <div class="flex items-center mb-3">
+                                <div class="w-10 h-10 bg-geel-secondary rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-hammer text-geel-primary"></i>
+                                </div>
+                                <span class="text-gray-600 font-medium">Práca</span>
+                            </div>
+                            <div class="text-3xl font-bold text-geel-dark" id="laborCost">0 €</div>
+                            <div class="text-xs text-gray-400 mt-1">pokládka + <span id="levelingText">bez nivelácie</span></div>
+                        </div>
+
+                        <!-- Total Cost -->
+                        <div class="result-card rounded-xl p-5 border-2 border-geel-primary shadow-lg bg-gradient-to-br from-white to-geel-cream">
+                            <div class="flex items-center mb-3">
+                                <div class="w-10 h-10 bg-geel-primary rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-coins text-white"></i>
+                                </div>
+                                <span class="text-geel-primary font-bold">Celkom</span>
+                            </div>
+                            <div class="text-4xl font-bold text-geel-primary" id="totalCost">0 €</div>
+                            <div class="text-xs text-gray-500 mt-1">orientačná cena s DPH</div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Table -->
+                    <div class="bg-white rounded-xl p-5 mb-8 shadow-md">
+                        <h4 class="font-bold text-geel-dark mb-4 flex items-center">
+                            <i class="fa-solid fa-list-check text-geel-accent mr-2"></i>
+                            Zhrnutie vašej konfigurácie
+                        </h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between py-2 border-b border-gray-100">
+                                <span class="text-gray-600">Plocha miestnosti</span>
+                                <span class="font-semibold" id="summaryArea">25 m²</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-gray-100">
+                                <span class="text-gray-600">Typ podlahy</span>
+                                <span class="font-semibold" id="summaryFloorType">Laminát</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-gray-100">
+                                <span class="text-gray-600">Rezerva na odpad</span>
+                                <span class="font-semibold" id="summaryWaste">10%</span>
+                            </div>
+                            <div class="flex justify-between py-2">
+                                <span class="text-gray-600">Nivelácia podkladu</span>
+                                <span class="font-semibold" id="summaryLeveling">Nie</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <a href="tel:+421948118202" class="flex-1 bg-geel-primary text-white px-6 py-4 rounded-xl font-bold hover:bg-geel-wood transition flex items-center justify-center shadow-lg">
+                            <i class="fa-solid fa-phone mr-3"></i>
+                            Zavolať pre presný odhad
+                        </a>
+                        <button onclick="downloadList()" class="flex-1 border-2 border-geel-primary text-geel-primary px-6 py-4 rounded-xl font-bold hover:bg-geel-primary hover:text-white transition flex items-center justify-center">
+                            <i class="fa-solid fa-download mr-3"></i>
+                            Stiahnuť nákupný zoznam
+                        </button>
+                    </div>
+
+                    <!-- Trust Banner -->
+                    <div class="mt-8 bg-white rounded-xl p-5 flex flex-col md:flex-row items-center justify-between border border-dashed border-geel-accent/50">
+                        <div class="flex items-center mb-4 md:mb-0">
+                            <div class="w-12 h-12 bg-geel-secondary rounded-full flex items-center justify-center mr-4">
+                                <i class="fa-solid fa-shield-halved text-geel-primary text-xl"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-geel-dark">Garantujeme kvalitu</div>
+                                <div class="text-sm text-gray-500">Bezplatná obhliadka a presná cenová ponuka</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-1 text-geel-accent">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <span class="ml-2 text-gray-600 text-sm font-medium">5.0 na Google</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-geel-dark text-white py-10 mt-10">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0 text-center md:text-left">
+                    <div class="font-bold text-2xl mb-2">
+                        <span class="text-geel-accent">GEEL</span> Stavebné práce
+                    </div>
+                    <p class="text-gray-400 text-sm">Prešov a okolie | Kvalitná práca za rozumnú cenu</p>
+                </div>
+                <div class="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-8">
+                    <a href="tel:+421948118202" class="flex items-center text-geel-accent hover:text-white transition">
+                        <i class="fa-solid fa-phone mr-2"></i>
+                        +421 948 118 202
+                    </a>
+                    <a href="mailto:gazdik.lubomir9@gmail.com" class="flex items-center text-geel-accent hover:text-white transition">
+                        <i class="fa-solid fa-envelope mr-2"></i>
+                        gazdik.lubomir9@gmail.com
+                    </a>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-500 text-sm">
+                <p>&copy; 2025 GEEL. Všetky práva vyhradené. | Vytvorené pre <a href="https://geel.sk" class="text-geel-accent hover:underline">geel.sk</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Update waste slider display
+        function updateWaste() {
+            const wasteValue = document.getElementById('wasteSlider').value;
+            document.getElementById('wasteValue').innerText = wasteValue;
+        }
+
+        // Floor type names in Slovak
+        const floorTypeNames = {
+            'laminat': 'Laminát',
+            'vinyl': 'Vinyl Click',
+            'drevo': 'Drevená podlaha'
+        };
+
+        // Main calculation function
+        function calculatePrice() {
+            // Get values
+            const area = parseFloat(document.getElementById('area').value) || 0;
+            const wastePercent = parseFloat(document.getElementById('wasteSlider').value) / 100;
+            const levelingChecked = document.getElementById('leveling').checked;
+            
+            // Get selected floor type
+            const selectedFloor = document.querySelector('input[name="floorType"]:checked');
+            const materialPricePerM2 = parseFloat(selectedFloor.dataset.material);
+            const laborPricePerM2 = parseFloat(selectedFloor.dataset.labor);
+            const floorType = selectedFloor.value;
+
+            // Calculate material area with waste
+            const materialArea = area * (1 + wastePercent);
+            
+            // Calculate costs
+            const materialCost = materialArea * materialPricePerM2;
+            let laborCost = area * laborPricePerM2;
+            
+            // Add leveling cost if selected
+            if (levelingChecked) {
+                laborCost += area * 10;
+            }
+
+            const totalCost = materialCost + laborCost;
+
+            // Update display
+            document.getElementById('materialCost').innerText = Math.round(materialCost).toLocaleString('sk-SK') + ' €';
+            document.getElementById('laborCost').innerText = Math.round(laborCost).toLocaleString('sk-SK') + ' €';
+            document.getElementById('totalCost').innerText = Math.round(totalCost).toLocaleString('sk-SK') + ' €';
+            document.getElementById('materialArea').innerText = materialArea.toFixed(1);
+            document.getElementById('levelingText').innerText = levelingChecked ? 'nivelácia' : 'bez nivelácie';
+
+            // Update summary
+            document.getElementById('summaryArea').innerText = area + ' m²';
+            document.getElementById('summaryFloorType').innerText = floorTypeNames[floorType];
+            document.getElementById('summaryWaste').innerText = Math.round(wastePercent * 100) + '%';
+            document.getElementById('summaryLeveling').innerText = levelingChecked ? 'Áno (+10€/m²)' : 'Nie';
+        }
+
+        // Show results section
+        function showResults() {
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.classList.remove('hidden');
+            setTimeout(() => {
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        // Download shopping list (dummy function)
+        function downloadList() {
+            const area = document.getElementById('area').value;
+            const wastePercent = document.getElementById('wasteSlider').value;
+            const materialArea = parseFloat(area) * (1 + parseFloat(wastePercent) / 100);
+            const selectedFloor = document.querySelector('input[name="floorType"]:checked');
+            const floorType = floorTypeNames[selectedFloor.value];
+            
+            alert(
+                `📋 Nákupný zoznam (demo):\n\n` +
+                `• Podlaha: ${floorType}\n` +
+                `• Potrebná plocha: ${materialArea.toFixed(1)} m²\n` +
+                `• Podložka: ${area} m²\n` +
+                `• Prechodové lišty: podľa potreby\n` +
+                `• Soklové lišty: obvod miestnosti\n\n` +
+                `Pre reálny export kontaktujte GEEL.`
+            );
+        }
+
+        // Add event listeners for floor type changes
+        document.querySelectorAll('input[name="floorType"]').forEach(radio => {
+            radio.addEventListener('change', calculatePrice);
+        });
+
+        // Initialize calculation on page load
+        document.addEventListener('DOMContentLoaded', calculatePrice);
+    </script>
+</body>
+</html>
