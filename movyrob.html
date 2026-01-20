@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulačka Elektromontáž - Movyrob</title>
+    
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- 1. ZÁKLADNÉ PREMENNÉ A RESET --- */
+        :root {
+            --primary-color: #001530; /* Tmavá modrá */
+            --accent-color: #d32e2f; /* Červená */
+            --text-color: #808285; /* Šedá */
+            --bg-color: #fff;
+            --light-bg: #f9f9f9;
+            --border-radius: 4px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            line-height: 1.85;
+            color: var(--primary-color);
+            background-color: var(--bg-color);
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4 {
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- 2. HLAVIČKA A ÚVOD --- */
+        header {
+            padding: 80px 0 60px;
+            text-align: center;
+            background-color: #fff;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 30px;
+        }
+
+        header h1::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background-color: var(--accent-color);
+            margin: 15px auto 0;
+        }
+
+        .intro-text {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+
+        /* --- 3. KALKULAČKA --- */
+        .calculator-section {
+            padding: 60px 0 100px;
+            background-color: var(--light-bg);
+            border-top: 1px solid #eee;
+            flex-grow: 1;
+        }
+
+        .calc-wrapper {
+            background: #fff;
+            padding: 50px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.08);
+            border-top: 5px solid var(--accent-color);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        /* Inputy */
+        select, input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            color: var(--primary-color);
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(211, 46, 47, 0.1);
+        }
+
+        /* Checkboxy */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .custom-checkbox {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            background: #fff;
+        }
+
+        .custom-checkbox:hover {
+            background-color: #fffbfb;
+            border-color: #ffcccc;
+        }
+
+        .custom-checkbox input {
+            margin-right: 12px;
+            accent-color: var(--accent-color);
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Tlačidlo */
+        .btn-calc {
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 30px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 6px rgba(211, 46, 47, 0.2);
+        }
+
+        .btn-calc:hover {
+            background-color: #b71c1c;
+            box-shadow: 0 8px 15px rgba(211, 46, 47, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Výsledok */
+        .result-box {
+            margin-top: 40px;
+            padding: 30px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border-radius: var(--border-radius);
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-price {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #fff;
+            margin: 15px 0;
+            line-height: 1;
+        }
+
+        .result-note {
+            font-size: 0.9rem;
+            color: #ccc;
+            font-style: italic;
+            margin-bottom: 0;
+        }
+
+        footer {
+            background: #111;
+            color: #666;
+            text-align: center;
+            padding: 30px;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        /* Responsivita */
+        @media (max-width: 768px) {
+            header h1 { font-size: 2rem; }
+            .calc-wrapper { padding: 25px; }
+            .checkbox-group { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1>Oddelenie elektromontážnej výroby</h1>
+            <p class="intro-text">
+                Máme bohaté skúsenosti s návrhom a realizáciou elektroinštalácií priemyselných, zdravotníckych, občianskych a bytových stavieb. Práce vykonávajú pravidelne školení pracovníci, ktorí sa plne sústredia na požiadavky odberateľa.
+            </p>
+        </div>
+    </header>
+
+    <section class="calculator-section">
+        <div class="container">
+            <div class="calc-wrapper">
+                <h2 style="text-align: center; margin-bottom: 10px;">Cenová kalkulácia elektroinštalácie</h2>
+                <p style="text-align: center; font-size: 0.9rem; margin-bottom: 40px;">Zadajte parametre pre orientačný odhad ceny.</p>
+                
+                <form id="elektroForm" onsubmit="event.preventDefault(); calculatePrice();">
+                    <div class="form-group">
+                        <label for="buildingType">Typ objektu</label>
+                        <select id="buildingType">
+                            <option value="45">Byt / Rodinný dom (Štandard)</option>
+                            <option value="55">Občianska vybavenosť / Kancelárie</option>
+                            <option value="70">Priemyselná hala / Výroba</option>
+                            <option value="85">Zdravotnícke zariadenie (Špeciálne požiadavky)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="area">Podlahová plocha (m²)</label>
+                        <input type="number" id="area" placeholder="napr. 120" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="scope">Rozsah prác</label>
+                        <select id="scope">
+                            <option value="1.0">Kompletná nová elektroinštalácia</option>
+                            <option value="1.3">Rekonštrukcia (vrátane demontáže starej)</option>
+                            <option value="0.4">Drobné opravy / Údržba</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Doplnkové služby</label>
+                        <div class="checkbox-group">
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="navrh" value="450">
+                                <span>Návrh osvetlenia a elektroinštalácie</span>
+                            </label>
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="udrzba" value="200">
+                                <span>Plánovaná údržba</span>
+                            </label>
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="revizia" value="250">
+                                <span>Revízna správa (VTZ)</span>
+                            </label>
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="rozvadzac" value="600">
+                                <span>Nový rozvádzač</span>
+                            </label>
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="bleskozvod" value="800">
+                                <span>Bleskozvod</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-calc">Vypočítať cenu</button>
+                </form>
+
+                <div id="result" class="result-box">
+                    <span>Odhadovaná cena realizácie:</span>
+                    <div class="result-price" id="totalPrice">0 €</div>
+                    <p class="result-note">
+                        * Cena je len orientačná a zahŕňa prácu a základný materiál. Pre presnú cenovú ponuku a obhliadku nás kontaktujte.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2024 Movyrob - Oddelenie elektromontážnej výroby
+    </footer>
+
+    <script>
+        function calculatePrice() {
+            // 1. Získanie hodnôt
+            const buildingCostPerM2 = parseFloat(document.getElementById('buildingType').value);
+            const area = parseFloat(document.getElementById('area').value);
+            const scopeMultiplier = parseFloat(document.getElementById('scope').value);
+
+            // Validácia
+            if (isNaN(area) || area <= 0) {
+                alert("Prosím zadajte platnú plochu v m².");
+                return;
+            }
+
+            // 2. Základný výpočet (Plocha * Cena za typ * Rozsah)
+            let basePrice = area * buildingCostPerM2 * scopeMultiplier;
+
+            // 3. Pripočítanie doplnkov (UPRAVENÉ)
+            let extras = 0;
+            if (document.getElementById('navrh').checked) extras += parseFloat(document.getElementById('navrh').value);
+            if (document.getElementById('udrzba').checked) extras += parseFloat(document.getElementById('udrzba').value);
+            if (document.getElementById('revizia').checked) extras += parseFloat(document.getElementById('revizia').value);
+            if (document.getElementById('rozvadzac').checked) extras += parseFloat(document.getElementById('rozvadzac').value);
+            if (document.getElementById('bleskozvod').checked) extras += parseFloat(document.getElementById('bleskozvod').value);
+
+            // 4. Celková suma
+            let total = basePrice + extras;
+
+            // Zaokrúhlenie na desiatky
+            total = Math.ceil(total / 10) * 10;
+
+            // 5. Zobrazenie
+            const resultBox = document.getElementById('result');
+            const priceText = document.getElementById('totalPrice');
+
+            priceText.innerText = total.toLocaleString('sk-SK', { style: 'currency', currency: 'EUR' });
+            
+            resultBox.style.display = 'block';
+            resultBox.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+
+</body>
+</html>
