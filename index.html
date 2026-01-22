@@ -300,18 +300,23 @@
         /* ===== Hero Section ===== */
         .hero {
             min-height: 100vh;
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             align-items: center;
-            justify-content: center;
             position: relative;
-            padding: 6rem 2rem 4rem;
+            padding: 6rem 4rem 4rem;
             overflow: hidden;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        /* Hero Background Image */
+        /* Hero Background - right side only */
         .hero-bg {
             position: absolute;
-            inset: 0;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
             overflow: hidden;
         }
 
@@ -333,11 +338,10 @@
             position: absolute;
             inset: 0;
             background: linear-gradient(
-                to bottom,
-                rgba(10, 10, 11, 0.4) 0%,
-                rgba(10, 10, 11, 0.6) 30%,
-                rgba(10, 10, 11, 0.85) 70%,
-                rgba(10, 10, 11, 1) 100%
+                to right,
+                rgba(10, 10, 11, 1) 0%,
+                rgba(10, 10, 11, 0.8) 30%,
+                rgba(10, 10, 11, 0.3) 100%
             );
             z-index: 1;
         }
@@ -345,8 +349,9 @@
         .hero-content {
             position: relative;
             z-index: 2;
-            text-align: center;
-            max-width: 1000px;
+            text-align: left;
+            max-width: 600px;
+            padding-right: 2rem;
         }
 
         .hero-badge {
@@ -380,7 +385,7 @@
 
         .hero h1 {
             font-family: 'Montserrat', sans-serif;
-            font-size: clamp(4rem, 15vw, 10rem);
+            font-size: clamp(2rem, 7vw, 5rem);
             font-weight: 900;
             line-height: 0.95;
             letter-spacing: -0.03em;
@@ -412,8 +417,8 @@
         .hero-description {
             font-size: clamp(1.1rem, 2vw, 1.5rem);
             color: var(--text-secondary);
-            max-width: 700px;
-            margin: 0 auto 3rem;
+            max-width: 600px;
+            margin: 0 0 3rem 0;
             line-height: 1.7;
             opacity: 0;
             animation: fadeInUp 0.8s var(--transition-smooth) 0.6s forwards;
@@ -422,7 +427,7 @@
         .hero-buttons {
             display: flex;
             gap: 1.25rem;
-            justify-content: center;
+            justify-content: flex-start;
             flex-wrap: wrap;
             opacity: 0;
             animation: fadeInUp 0.8s var(--transition-smooth) 0.8s forwards;
@@ -1552,6 +1557,30 @@
 
         /* ===== Responsive ===== */
         @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+                padding: 6rem 2rem 4rem;
+            }
+
+            .hero-bg {
+                width: 100%;
+                left: 0;
+            }
+
+            .hero-content {
+                max-width: 100%;
+                text-align: center;
+                padding-right: 0;
+            }
+
+            .hero-description {
+                margin: 0 auto 3rem;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
             .about-grid {
                 grid-template-columns: 1fr;
                 gap: 3rem;
@@ -1655,58 +1684,6 @@
     <!-- Navigation -->
     <nav>
         <div class="nav-container">
-            <a href="#hero" class="logo">
-                <div class="logo-container">
-                    <svg class="logo-pc" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- PC Case Back -->
-                        <rect x="4" y="4" width="40" height="40" rx="4" stroke="url(#logoGrad)" stroke-width="2.5" fill="var(--bg-secondary)"/>
-                        <!-- PC Internals (visible when open) -->
-                        <g class="pc-internals">
-                            <rect x="8" y="8" width="14" height="8" rx="1" fill="#22c55e" opacity="0.6"/>
-                            <rect x="8" y="18" width="20" height="3" rx="1" fill="#6366f1" opacity="0.8"/>
-                            <rect x="8" y="23" width="20" height="3" rx="1" fill="#8b5cf6" opacity="0.8"/>
-                            <rect x="8" y="28" width="20" height="3" rx="1" fill="#a855f7" opacity="0.6"/>
-                            <circle cx="36" cy="12" r="4" fill="#ef4444" opacity="0.5"/>
-                            <rect x="32" y="20" width="8" height="16" rx="1" fill="url(#logoGrad)" opacity="0.3"/>
-                        </g>
-                        <!-- TK Text inside -->
-                        <text x="24" y="30" text-anchor="middle" font-family="Montserrat, sans-serif" font-weight="800" font-size="14" fill="url(#logoGrad)" class="tk-text">TK</text>
-                        <!-- Glass Side Panel -->
-                        <g class="glass-panel-group">
-                            <rect class="glass-panel" x="4" y="4" width="40" height="40" rx="4" fill="rgba(99, 102, 241, 0.15)" stroke="url(#logoGrad)" stroke-width="2.5"/>
-                            <!-- 4 Screws -->
-                            <g class="screw screw-1">
-                                <circle cx="8" cy="8" r="2.5" fill="#3f3f46" stroke="#52525b" stroke-width="0.5"/>
-                                <line x1="6" y1="8" x2="10" y2="8" stroke="#27272a" stroke-width="1"/>
-                                <line x1="8" y1="6" x2="8" y2="10" stroke="#27272a" stroke-width="1"/>
-                            </g>
-                            <g class="screw screw-2">
-                                <circle cx="40" cy="8" r="2.5" fill="#3f3f46" stroke="#52525b" stroke-width="0.5"/>
-                                <line x1="38" y1="8" x2="42" y2="8" stroke="#27272a" stroke-width="1"/>
-                                <line x1="40" y1="6" x2="40" y2="10" stroke="#27272a" stroke-width="1"/>
-                            </g>
-                            <g class="screw screw-3">
-                                <circle cx="8" cy="40" r="2.5" fill="#3f3f46" stroke="#52525b" stroke-width="0.5"/>
-                                <line x1="6" y1="40" x2="10" y2="40" stroke="#27272a" stroke-width="1"/>
-                                <line x1="8" y1="38" x2="8" y2="42" stroke="#27272a" stroke-width="1"/>
-                            </g>
-                            <g class="screw screw-4">
-                                <circle cx="40" cy="40" r="2.5" fill="#3f3f46" stroke="#52525b" stroke-width="0.5"/>
-                                <line x1="38" y1="40" x2="42" y2="40" stroke="#27272a" stroke-width="1"/>
-                                <line x1="40" y1="38" x2="40" y2="42" stroke="#27272a" stroke-width="1"/>
-                            </g>
-                        </g>
-                        <defs>
-                            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#6366f1"/>
-                                <stop offset="50%" style="stop-color:#8b5cf6"/>
-                                <stop offset="100%" style="stop-color:#a855f7"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <span class="logo-name">Tomáš Kancír</span>
-                </div>
-            </a>
             <ul class="nav-links">
                 <li><a href="#hero">Domov</a></li>
                 <li><a href="#about">O mne</a></li>
@@ -1763,9 +1740,6 @@
                     </svg>
                     Rezervuj si stretnutie
                 </button>
-                <a href="#about" class="btn btn-secondary">
-                    Zisti viac
-                </a>
             </div>
         </div>
     </section>
@@ -1776,6 +1750,7 @@
             <div class="section-header reveal">
                 <span class="section-tag">O mne</span>
                 <h2 class="section-title">Kto som a čo robím</h2>
+                <h3 style="font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; color: var(--text-secondary); margin-top: 2rem; max-width: 100%;">20-ročný web developer, ktorý si buduje svoju cestu</h3>
             </div>
 
             <div class="about-grid">
@@ -1793,28 +1768,12 @@
                 </div>
 
                 <div class="about-content reveal reveal-delay-2">
-                    <h3>20-ročný web developer, ktorý si buduje svoju cestu</h3>
                     <p>
                         Odišiel som z vysokej školy, aby som si mohol vytvoriť vlastnú hodnotu. Verím, že najlepšie vzdelanie príde z praxe a reálnych projektov. Každý deň sa učím niečo nové a dokumentujem svoju cestu na sociálnych sieťach.
                     </p>
                     <p>
                         Zaujímam sa o vytváranie webových stránok, automatizáciu pomocou AI, troubleshooting PC hardvéru a skladanie stolných počítačov. Môj cieľ? Naučiť sa čo najviac a pomáhať ostatným riešiť ich technické problémy.
                     </p>
-
-                    <div class="about-stats">
-                        <div class="stat">
-                            <div class="stat-number">20</div>
-                            <div class="stat-label">Rokov</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">1+</div>
-                            <div class="stat-label">Mesiac učenia</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">∞</div>
-                            <div class="stat-label">Motivácia</div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -2087,7 +2046,19 @@
                             </div>
                             <div class="contact-method-text">
                                 <span>Email</span>
-                                <a href="mailto:kancir.tomas@gmail.com">kancir.tomas@gmail.com</a>
+                                <a href="/cdn-cgi/l/email-protection#254e444b464c570b514a484456654248444c490b464a48"><span class="__cf_email__" data-cfemail="5c373d323f352e722833313d2f1c3b313d3530723f3331">[email&#160;protected]</span></a>
+                            </div>
+                        </div>
+
+                        <div class="contact-method">
+                            <div class="contact-method-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                            </div>
+                            <div class="contact-method-text">
+                                <span>Telefón</span>
+                                <a href="tel:+421908109204">+421 908 109 204</a>
                             </div>
                         </div>
 
@@ -2128,12 +2099,22 @@
                     <form class="contact-form" id="contactForm">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="name">Meno</label>
-                                <input type="text" id="name" name="name" placeholder="Tvoje meno" required>
+                                <label for="firstName">Meno</label>
+                                <input type="text" id="firstName" name="firstName" placeholder="Tvoje meno" required>
                             </div>
+                            <div class="form-group">
+                                <label for="lastName">Priezvisko</label>
+                                <input type="text" id="lastName" name="lastName" placeholder="Tvoje priezvisko" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
                             <div class="form-group">
                                 <label for="email">Email *</label>
                                 <input type="email" id="email" name="email" placeholder="tvoj@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Telefón *</label>
+                                <input type="tel" id="phone" name="phone" placeholder="+421 900 000 000" required>
                             </div>
                         </div>
                         <div class="form-group">
@@ -2141,7 +2122,7 @@
                             <input type="text" id="subject" name="subject" placeholder="O čom to bude?">
                         </div>
                         <div class="form-group">
-                            <label for="message">Správa</label>
+                            <label for="message">Správa *</label>
                             <textarea id="message" name="message" placeholder="Napíš mi svoju správu..." required></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary btn-submit">
@@ -2151,7 +2132,7 @@
                             </svg>
                             Odoslať správu
                         </button>
-                        <p class="form-note">Odpoviem ti čo najskôr :)</p>
+                        <p class="form-note">Odpoviem čo najskôr :)</p>
                     </form>
                 </div>
             </div>
@@ -2193,7 +2174,7 @@
     </div>
 
     <!-- Cal.com Script -->
-    <script type="text/javascript">
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
         (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
         Cal("init", "stretko-s-tomasom", {origin:"https://app.cal.com"});
         Cal.ns["stretko-s-tomasom"]("inline", {
@@ -2214,7 +2195,7 @@
             </div>
 
             <p class="footer-text">
-                © 2025 Všetky práva vyhradené. Vytvorené s ❤️ a veľa kávy.
+                © 2026 Všetky práva vyhradené.
             </p>
         </div>
     </footer>
@@ -2288,8 +2269,10 @@
             // Get form data
             const formData = new FormData(this);
             const data = {
-                name: formData.get('name'),
+                firstName: formData.get('firstName'),
+                lastName: formData.get('lastName'),
                 email: formData.get('email'),
+                phone: formData.get('phone'),
                 subject: formData.get('subject') || 'Správa z portfólia',
                 message: formData.get('message')
             };
@@ -2304,10 +2287,10 @@
                     body: JSON.stringify({
                         access_key: '32615c41-d78b-4f52-bab1-2190f13b25c4',
                         to_email: 'kancir.tomas@gmail.com',
-                        from_name: data.name,
+                        from_name: `${data.firstName} ${data.lastName}`,
                         from_email: data.email,
                         subject: `[Portfólio] ${data.subject}`,
-                        message: `Meno: ${data.name}\nEmail: ${data.email}\nPredmet: ${data.subject}\n\nSpráva:\n${data.message}`
+                        message: `Meno: ${data.firstName} ${data.lastName}\nEmail: ${data.email}\nTelefón: ${data.phone}\nPredmet: ${data.subject}\n\nSpráva:\n${data.message}`
                     })
                 });
 
@@ -2421,12 +2404,4 @@
         if (!localStorage.getItem('cookiesAccepted')) {
             setTimeout(() => {
                 document.getElementById('cookie-banner').style.transform = 'translateY(0)';
-            }, 2000); // Ukáže sa po 2 sekundách
-        }
-        function acceptCookies() {
-            localStorage.setItem('cookiesAccepted', 'true');
-            document.getElementById('cookie-banner').style.transform = 'translateY(100%)';
-        }
-    </script>
-</body>
-</html>
+            }, 2000); // Ukáže sa po 2
