@@ -96,7 +96,7 @@
         }
 
         nav.scrolled {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.6) 0%, rgba(139, 92, 246, 0.6) 50%, rgba(168, 85, 247, 0.6) 100%);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.5) 0%, rgba(139, 92, 246, 0.5) 50%, rgba(168, 85, 247, 0.5) 100%);
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             padding: 0.75rem 2rem;
         }
@@ -301,24 +301,23 @@
         /* ===== Hero Section ===== */
         .hero {
             min-height: 100vh;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
             align-items: center;
+            justify-content: center;
             position: relative;
             padding: 6rem 4rem 4rem;
             overflow: hidden;
-            max-width: 1400px;
-            margin: 0 auto;
         }
 
-        /* Hero Background - right side only */
+        /* Hero Background - right side to edge */
         .hero-bg {
-            position: absolute;
+            position: fixed;
             top: 0;
             right: 0;
-            width: 50%;
-            height: 100%;
+            width: 50vw;
+            height: 100vh;
             overflow: hidden;
+            z-index: 0;
         }
 
         .hero-bg-image {
@@ -351,8 +350,19 @@
             position: relative;
             z-index: 2;
             text-align: left;
+            max-width: 1400px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding-left: 2rem;
+        }
+
+        .hero-content .hero-badge,
+        .hero-content h1,
+        .hero-content .hero-description,
+        .hero-content .hero-buttons {
             max-width: 600px;
-            padding-right: 2rem;
         }
 
         .hero-badge {
@@ -1560,19 +1570,20 @@
         /* ===== Responsive ===== */
         @media (max-width: 1024px) {
             .hero {
-                grid-template-columns: 1fr;
                 padding: 6rem 2rem 4rem;
             }
 
             .hero-bg {
-                width: 100%;
+                width: 100vw;
                 left: 0;
+                right: 0;
             }
 
             .hero-content {
                 max-width: 100%;
                 text-align: center;
-                padding-right: 0;
+                padding-left: 0;
+                align-items: center;
             }
 
             .hero-description {
