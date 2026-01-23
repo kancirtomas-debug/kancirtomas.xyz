@@ -109,145 +109,6 @@
             align-items: center;
         }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 0;
-            position: relative;
-            overflow: visible;
-        }
-
-        .logo-pc {
-            transition: transform 0.3s var(--transition-smooth);
-            position: relative;
-            z-index: 2;
-            overflow: visible;
-        }
-
-        .logo-container:hover .logo-pc {
-            transform: scale(1.05);
-        }
-
-        /* Screws animation */
-        .screw {
-            transform-origin: center;
-            transform: rotate(0deg) scale(1);
-            opacity: 1;
-        }
-
-        /* Default state - reverse animation (screwing back in) - rotate back */
-        .screw-1 { 
-            transition: transform 0.3s var(--transition-smooth), opacity 0.25s var(--transition-smooth);
-            transition-delay: 0.35s; 
-        }
-        .screw-2 { 
-            transition: transform 0.3s var(--transition-smooth), opacity 0.25s var(--transition-smooth);
-            transition-delay: 0.25s; 
-        }
-        .screw-3 { 
-            transition: transform 0.3s var(--transition-smooth), opacity 0.25s var(--transition-smooth);
-            transition-delay: 0.15s; 
-        }
-        .screw-4 { 
-            transition: transform 0.3s var(--transition-smooth), opacity 0.25s var(--transition-smooth);
-            transition-delay: 0.05s; 
-        }
-
-        /* Hover state - unscrewing (pull out without rotation) */
-        .logo-container:hover .screw-1 {
-            transform: scale(1.5);
-            opacity: 0;
-            transition-delay: 0s;
-        }
-
-        .logo-container:hover .screw-2 {
-            transform: scale(1.5);
-            opacity: 0;
-            transition-delay: 0.08s;
-        }
-
-        .logo-container:hover .screw-3 {
-            transform: scale(1.5);
-            opacity: 0;
-            transition-delay: 0.16s;
-        }
-
-        .logo-container:hover .screw-4 {
-            transform: scale(1.5);
-            opacity: 0;
-            transition-delay: 0.24s;
-        }
-
-        /* Glass panel slides left slowly and fades */
-        .glass-panel {
-            transition: transform 0.4s var(--transition-smooth), opacity 0.35s var(--transition-smooth);
-            transition-delay: 0.1s;
-        }
-
-        .logo-container:hover .glass-panel {
-            transform: translateX(-70px);
-            opacity: 0;
-            transition-delay: 0.35s;
-        }
-
-        /* Screws stay with glass initially, then panel moves */
-        .glass-panel-group {
-            overflow: visible;
-        }
-
-        /* PC internals glow on hover */
-        .pc-internals {
-            opacity: 0.3;
-            transition: opacity 0.25s var(--transition-smooth);
-            transition-delay: 0s;
-        }
-
-        .logo-container:hover .pc-internals {
-            opacity: 1;
-            transition-delay: 0.5s;
-        }
-
-        /* TK text fade out */
-        .tk-text {
-            transition: opacity 0.2s var(--transition-smooth);
-            transition-delay: 0s;
-        }
-
-        .logo-container:hover .tk-text {
-            opacity: 0;
-            transition-delay: 0.5s;
-        }
-
-        /* Name slides out */
-        .logo-name {
-            font-family: var(--font-display);
-            font-size: 1.1rem;
-            font-weight: 700;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            white-space: nowrap;
-            opacity: 0;
-            transform: translateX(-20px);
-            transition: all 0.3s var(--transition-smooth);
-            transition-delay: 0s;
-            margin-left: -10px;
-            padding-left: 20px;
-        }
-
-        .logo-container:hover .logo-name {
-            opacity: 1;
-            transform: translateX(0);
-            transition-delay: 0.6s;
-        }
-
         .nav-links {
             display: flex;
             gap: 2.5rem;
@@ -309,7 +170,7 @@
             overflow: hidden;
         }
 
-        /* Hero Background - right side to edge - OPRAVENÉ: zmenené z fixed na absolute */
+        /* Hero Background - right side to edge */
         .hero-bg {
             position: absolute;
             top: 0;
@@ -324,14 +185,15 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center center;
-            filter: grayscale(30%);
+            object-position: center top;
+            filter: grayscale(20%);
             transform: scale(1.05);
-            transition: transform 8s ease-out;
+            transition: transform 8s ease-out, filter 0.5s ease;
         }
 
         .hero:hover .hero-bg-image {
             transform: scale(1);
+            filter: grayscale(0%);
         }
 
         .hero-image-overlay {
@@ -340,8 +202,9 @@
             background: linear-gradient(
                 to right,
                 rgba(10, 10, 11, 1) 0%,
-                rgba(10, 10, 11, 0.8) 30%,
-                rgba(10, 10, 11, 0.3) 100%
+                rgba(10, 10, 11, 0.85) 25%,
+                rgba(10, 10, 11, 0.4) 60%,
+                rgba(10, 10, 11, 0.2) 100%
             );
             z-index: 1;
         }
@@ -1475,40 +1338,6 @@
             margin-bottom: 1.5rem;
         }
 
-        .footer-legal {
-            margin-bottom: 1.5rem;
-            padding: 1.5rem;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            display: inline-block;
-        }
-
-        .footer-legal p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-bottom: 0.35rem;
-        }
-
-        .footer-legal p:last-child {
-            margin-bottom: 0;
-        }
-
-        .footer-legal strong {
-            color: var(--text-primary);
-        }
-
-        .footer-legal .placeholder {
-            color: var(--accent);
-            font-style: italic;
-        }
-
-        .footer-register {
-            font-size: 0.85rem !important;
-            color: var(--text-muted) !important;
-            margin-top: 0.5rem !important;
-        }
-
         .footer-links {
             margin-bottom: 1.5rem;
         }
@@ -1720,7 +1549,7 @@
     <section class="hero" id="hero">
         <div class="hero-bg">
             <div class="hero-image-overlay"></div>
-            <img src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1920&h=1080&fit=crop" alt="Abstract Background" class="hero-bg-image">
+            <img src="hero-photo.jpg" alt="Tomáš Kancír" class="hero-bg-image">
         </div>
         
         <div class="hero-content">
@@ -2248,7 +2077,7 @@
         window.addEventListener('scroll', checkReveal);
         window.addEventListener('load', checkReveal);
 
-        // ===== Form Handling with EmailJS =====
+        // ===== Form Handling with Web3Forms =====
         const contactForm = document.getElementById('contactForm');
 
         contactForm.addEventListener('submit', async function(e) {
@@ -2279,7 +2108,7 @@
             };
 
             try {
-                // Send via Web3Forms (free, no signup required for basic use)
+                // Send via Web3Forms
                 const response = await fetch('https://api.web3forms.com/submit', {
                     method: 'POST',
                     headers: {
