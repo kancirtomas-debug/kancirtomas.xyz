@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fotovoltaická Kalkulačka | WILSON BROCK®</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700,800&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,500,700,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0b;
+            --bg-secondary: #111113;
+            --bg-tertiary: #1f1f22;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --border: #27272a;
+            --gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            --font-body: 'Cabinet Grotesk', sans-serif;
+            --font-display: 'Montserrat', sans-serif;
+            --green: #22c55e;
+            --minero-blue: #0066ff;
+            --gold: #f59e0b;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding: 20px;
+            font-size: 18px; /* Základná veľkosť */
+        }
+        
+        .ct-section-inner-wrap { max-width: 950px; margin: 0 auto; }
+        .w-full { width: 100%; }
+        .centered { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .p-compact { padding: 1.5rem; }
+        .mb-compact { margin-bottom: 1rem; }
+        .mt-compact { margin-top: 0.5rem; }
+        .gap-compact { gap: 1rem; }
+        .rounded-t { border-top-left-radius: 16px; border-top-right-radius: 16px; background: var(--bg-secondary); }
+        .rounded-b { border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; background: var(--bg-secondary); }
+        .rounded { border-radius: 16px; }
+        .grid { display: grid; gap: 1.5rem; }
+        .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .lg-grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .results-grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; align-items: stretch; }
+        
+        @media (max-width: 600px) {
+            .grid-cols-3, .lg-grid-cols-2, .results-grid-row { grid-template-columns: 1fr; }
+        }
+        
+        /* Back button */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            transition: color 0.3s ease;
+        }
+        .back-btn:hover { color: var(--accent); }
+        .back-btn svg { width: 22px; height: 22px; }
+        
+        /* Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .page-header h1 {
+            font-family: var(--font-display);
+            font-size: 2.4rem;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+        
+        /* Tab Navigation - UPRAVENÉ (väčší text) */
+        .calc-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+            background: var(--bg-secondary);
+            padding: 8px;
+            border-radius: 16px;
+        }
+        .calc-tab {
+            flex: 1;
+            min-width: 150px;
+            padding: 16px 20px; /* Zväčšený padding */
+            background: transparent;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 1.1rem; /* Zväčšený text */
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .calc-tab:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        .calc-tab.active {
+            background: var(--gradient-1);
+            color: white;
+            border-color: transparent;
+        }
+        
+        @media (max-width: 768px) {
+            .calc-tab {
+                min-width: calc(50% - 4px);
+                font-size: 1rem;
+                padding: 12px 14px;
+            }
+        }
+        
+        /* Calculator Panels */
+        .calc-panel {
+            display: none;
+        }
+        .calc-panel.active {
+            display: block;
+        }
+        
+        /* Calculator Content */
+        .calculator { max-width: 850px; margin: 0 auto 1.5rem auto; text-align: left; }
+        h3.ct-headline { font-size: 1.8rem; } /* Zväčšené */
+        h4.ct-headline { font-size: 1.4rem; } /* Zväčšené */
+        .color-white { color: white; }
+        .bg-primary { background: var(--gradient-1); }
+        
+        /* Roof Type Toggle */
+        .choose-gender {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            background: var(--bg-tertiary);
+            padding: 5px;
+            border-radius: 10px;
+        }
+        .segmented-control { flex: 1; position: relative; }
+        .segmented-control input { display: none; }
+        .segmented-control label {
+            display: block;
+            text-align: center;
+            padding: 14px 5px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.3s;
+            font-size: 1.1rem; /* Zväčšené */
+            color: var(--text-secondary);
+            line-height: 1.2;
+        }
+        .segmented-control input:checked + label {
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Input Labels - UPRAVENÉ */
+        label.input-label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.2rem; /* Zväčšené */
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        /* Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            margin-bottom: 0.8rem;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 28px; /* Zväčšené */
+            width: 28px; /* Zväčšené */
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            margin-top: -12px;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: var(--border);
+            border-radius: 3px;
+        }
+        
+        /* Input Fields */
+        .manual-input-wrapper { position: relative; margin-bottom: 1.5rem; }
+        .manual-input-field, select.custom-select, .ff-el-form-control {
+            width: 100%;
+            padding: 16px; /* Zväčšené */
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 8px;
+            font-size: 1.2rem; /* Zväčšené */
+            font-family: var(--font-body);
+        }
+        .manual-input-field:focus, select.custom-select:focus, .ff-el-form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .currency-symbol {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+        
+        /* Checkbox Wrapper */
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--bg-tertiary);
+            padding: 18px; /* Zväčšené */
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+        .checkbox-wrapper:hover { border-color: var(--accent); }
+        .custom-checkbox {
+            appearance: none;
+            width: 26px; /* Zväčšené */
+            height: 26px; /* Zväčšené */
+            border: 2px solid var(--text-secondary);
+            border-radius: 6px;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .custom-checkbox:checked {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        .custom-checkbox:checked::after {
+            content: '✔';
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+        }
+        .checkbox-label {
+            font-size: 1.15rem; /* Zväčšené */
+            color: white;
+            cursor: pointer;
+            margin-bottom: 0 !important;
+        }
+        
+        /* ASIC Section */
+        .asic-section {
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, rgba(0, 102, 255, 0.1) 100%);
+            border: 1px solid var(--minero-blue);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .asic-checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+        }
+        .asic-checkbox:checked {
+            background: var(--minero-blue);
+            border-color: var(--minero-blue);
+        }
+        .asic-label {
+            font-size: 1.15rem; /* Zväčšené */
+            color: var(--minero-blue);
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 0 !important;
+        }
+        .asic-options {
+            display: none;
+            margin-top: 1.25rem;
+            gap: 1rem;
+        }
+        .asic-options.visible {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        @media (max-width: 600px) {
+            .asic-options.visible { grid-template-columns: 1fr; }
+        }
+        .asic-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .asic-card:hover {
+            border-color: var(--minero-blue);
+            transform: translateY(-2px);
+        }
+        .asic-card.selected {
+            border-color: var(--minero-blue);
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.3);
+            background: rgba(0, 102, 255, 0.1);
+        }
+        .asic-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+        }
+        .asic-card h4 {
+            font-family: var(--font-display);
+            font-size: 1rem; /* Zväčšené */
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: white;
+        }
+        .asic-card .asic-for {
+            font-size: 0.9rem; /* Zväčšené */
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        .asic-card .asic-link {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--minero-blue);
+            color: white;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        .asic-card .asic-link:hover { transform: scale(1.05); }
+        .asic-card.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            filter: grayscale(100%);
+            cursor: not-allowed;
+            position: relative;
+        }
+        .asic-card.disabled::after {
+            content: "Vyžaduje väčší systém";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        /* Dotácie Section */
+        .dotacie-section {
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, rgba(34, 197, 94, 0.1) 100%);
+            border: 1px solid var(--green);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .dotacie-title {
+            font-size: 1.2rem; /* Zväčšené */
+            color: var(--green);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .dotacie-options { display: grid; gap: 0.75rem; }
+        .dotacie-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 1.2rem; /* Zväčšené */
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .dotacie-option:hover { border-color: var(--green); }
+        .dotacie-option.selected {
+            border-color: var(--green);
+            background: rgba(34, 197, 94, 0.1);
+        }
+        .dotacie-radio {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--text-secondary);
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .dotacie-radio:checked { border-color: var(--green); }
+        .dotacie-radio:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 14px;
+            height: 14px;
+            background: var(--green);
+            border-radius: 50%;
+        }
+        .dotacie-content { flex: 1; }
+        .dotacie-content h4 {
+            font-size: 1.1rem; /* Zväčšené */
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: white;
+        }
+        .dotacie-content p {
+            font-size: 1rem; /* Zväčšené */
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        .dotacie-content .highlight {
+            color: var(--green);
+            font-weight: 700;
+        }
+        .dotacie-badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            background: var(--green);
+            color: white;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        
+        /* Results - UPRAVENÉ (zväčšené texty) */
+        .results .title-small {
+            font-size: 1.1rem; /* Zväčšené z 0.95rem */
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+        .results .value {
+            font-size: 1.4rem; /* Zväčšené z 1.3rem */
+            font-weight: 700;
+            color: white;
+            margin-top: 0;
+        }
+        .ct-headline.result-value { font-size: 1.6rem; font-weight: 800; }
+        .result-label { 
+            opacity: 1; /* Lepšia viditeľnosť */
+            font-size: 1.1rem; /* Zväčšené z 0.85rem */
+            color: white; 
+            margin-bottom: 5px; 
+        }
+        .result-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+        .result-box.highlight-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        /* Price Note */
+        .price-note {
+            text-align: center;
+            padding: 1.2rem;
+            background: var(--bg-tertiary);
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            margin: 1.5rem 0;
+        }
+        .price-note p { 
+            color: var(--text-secondary); 
+            font-size: 1rem; /* Zväčšené */
+        }
+        .price-note strong { color: var(--text-primary); }
+        
+        /* Form */
+        .fluentform { margin-top: 1rem; }
+        .ff-el-group { margin-bottom: 12px; text-align: left; }
+        .ff-btn-submit {
+            background: var(--gradient-1);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.2rem; /* Zväčšené */
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .ff-btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px var(--accent-glow);
+        }
+        .contact-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1rem; /* Zväčšené */
+            color: var(--text-secondary);
+        }
+        select.custom-select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23a1a1aa%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right .7em top 50%;
+            background-size: .65em auto;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Home Button */
+        .home-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 1.2rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        /* Calculator Description */
+        .calc-description {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--accent);
+        }
+        .calc-description h4 {
+            color: var(--accent);
+            font-size: 1.2rem; /* Zväčšené */
+            margin-bottom: 0.5rem;
+        }
+        .calc-description p {
+            color: var(--text-secondary);
+            font-size: 1.1rem; /* Zväčšené */
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="ct-section-inner-wrap">
+        <a href="index.html" class="back-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Späť na hlavnú stránku
+        </a>
+        
+        <div class="page-header">
+            <h1>FOTOVOLTAICKÉ KALKULAČKY</h1>
+            <p>Vyberte si typ kalkulačky podľa vašich potrieb</p>
+        </div>
+        
+        <div class="calc-tabs">
+            <button class="calc-tab active" data-tab="zakladna">
+                Základná
+            </button>
+            <button class="calc-tab" data-tab="bateria">
+                S Batériou
+            </button>
+            <button class="calc-tab" data-tab="asic">
+                S ASIC Minerom
+            </button>
+            <button class="calc-tab" data-tab="kombinovana">
+                Batéria + Miner
+            </button>
+            <button class="calc-tab" data-tab="dotacie">
+                Kompletná + Dotácie
+            </button>
+        </div>
+        
+        <div class="calc-panel active" id="panel-zakladna">
+            <div class="ct-div-block w-full p-compact rounded-t" style="padding-bottom: 0;">
+                <div class="ct-div-block w-full centered">
+                    <h3 class="ct-headline mb-compact mt-compact text-white">ZÁKLADNÁ KALKULAČKA</h3>
+                </div>
+            </div>
+            <div class="ct-div-block w-full rounded-b p-compact">
+                <div class="calc-description">
+                    <h4>📊 Jednoduchý výpočet návratnosti</h4>
+                    <p>Zadajte mesačný účet za elektrinu a zistite odporúčanú veľkosť systému, cenu a dobu návratnosti.</p>
+                </div>
+                
+                <div class="calculator">
+                    <label class="input-label">Typ strechy?</label>
+                    <div class="choose-gender">
+                        <div class="segmented-control">
+                            <input id="typ-strechy-plocha-1" type="radio" name="typ-strechy-1" value="plocha">
+                            <label for="typ-strechy-plocha-1">Plochá</label>
+                        </div>
+                        <div class="segmented-control">
+                            <input id="typ-strechy-sedlova-1" type="radio" name="typ-strechy-1" value="sedlova" checked>
+                            <label for="typ-strechy-sedlova-1">Sedlová (šikmá 15°-35°)</label>
+                        </div>
+                    </div>
+                    
+                    <label class="input-label" for="mesacny-ucet-slider-1">Mesačný účet za elektrinu (€):</label>
+                    <input id="mesacny-ucet-slider-1" type="range" value="60" min="50" max="300" step="5">
+                    <div class="manual-input-wrapper">
+                        <input type="number" id="mesacny-ucet-input-1" class="manual-input-field" value="60" min="0">
+                        <span class="currency-symbol">€</span>
+                    </div>
+                </div>
+                
+                <div class="results ct-div-block w-full grid grid-cols-3 gap-compact p-compact centered" style="background: rgba(255,255,255,0.03); border-radius: 12px;">
+                    <div class="centered"><h6 class="title-small">Mesačná spotreba:</h6><h6 class="value" id="mesacna-spotreba-1">0 kWh</h6></div>
+                    <div class="centered"><h6 class="title-small">Ročná spotreba:</h6><h6 class="value" id="rocna-spotreba-1">0 kWh</h6></div>
+                    <div class="centered"><h6 class="title-small">Ročná cena za el.:</h6><h6 class="value" id="rocna-cena-1">0 €</h6></div>
+                </div>
+                <br>
+                <div class="ct-div-block w-full results-grid-row bg-primary p-compact centered mb-compact rounded">
+                    <div class="result-box"><h6 class="ct-headline result-label">Veľkosť systému:</h6><h6 class="ct-headline color-white" id="velkost-1">0 kWp</h6></div>
+                    <div class="result-box"><h6 class="ct-headline result-label">Plocha:</h6><h6 class="ct-headline color-white" id="plocha-1">0 m²</h6></div>
+                    <div class="result-box" style="background: rgba(0,0,0,0.2); border-radius: 10px;"><h6 class="ct-headline result-label" style="font-weight: 700;">Cena realizácie:</h6><h6 class="ct-headline color-white" id="cena-1">0 €</h6></div>
+                    <div class="result-box highlight-box"><h6 class="ct-headline result-label" style="font-weight: 700;">Návratnosť:</h6><h6 class="ct-headline color-white" id="navratnost-1">0 rokov</h6></div>
+                </div>
+                
+                <div class="price-note">
+                    <p>⚠️ <strong>Upozornenie:</strong> Ceny sú orientačné a líšia sa podľa použitého sortimentu, značky komponentov a náročnosti inštalácie.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="calc-panel" id="panel-bateria">
+            <div class="ct-div-block w-full p-compact rounded-t" style="padding-bottom: 0;">
+                <div class="ct-div-block w-full centered">
+                    <h3 class="ct-headline mb-compact mt-compact text-white">KALKULAČKA S BATÉRIOU</h3>
+                </div>
+            </div>
+            <div class="ct-div-block w-full rounded-b p-compact">
+                <div class="calc-description">
+                    <h4>🔋 Výpočet s domácim úložiskom energie</h4>
+                    <p>Batéria zvyšuje sebestačnosť na ~85% a umožňuje využiť energiu aj v noci.</p>
+                </div>
+                
+                <div class="calculator">
+                    <label class="input-label">Typ strechy?</label>
+                    <div class="choose-gender">
+                        <div class="segmented-control">
+                            <input id="typ-strechy-plocha-2" type="radio" name="typ-strechy-2" value="plocha">
+                            <label for="typ-strechy-plocha-2">Plochá</label>
+                        </div>
+                        <div class="segmented-control">
+                            <input id="typ-strechy-sedlova-2" type="radio" name="typ-strechy-2" value="sedlova" checked>
+                            <label for="typ-strechy-sedlova-2">Sedlová (šikmá 15°-35°)</label>
+                        </div>
+                    </div>
+                    
+                    <label class="input-label" for="mesacny-ucet-slider-2">Mesačný účet za elektrinu (€):</label>
+                    <input id="mesacny-ucet-slider-2" type="range" value="60" min="50" max="300" step="5">
+                    <div class="manual-input-wrapper">
+                        <input type="number" id="mesacny-ucet-input-2" class="manual-input-field" value="60" min="0">
+                        <span class="currency-symbol">€</span>
+                    </div>
+                    
+                    <div class="checkbox-wrapper" onclick="document.getElementById('bateria-check-2').click(); event.stopPropagation();">
+                        <input type="checkbox" id="bateria-check-2" class="custom-checkbox" checked onclick="event.stopPropagation();">
+                        <label for="bateria-check-2" class="checkbox-label" onclick="event.stopPropagation();">Chcem aj batériové úložisko</label>
+                    </div>
+                </div>
+                
+                <div class="results ct-div-block w-full grid grid-cols-3 gap-compact p-compact centered" style="background: rgba(255,255,255,0.03); border-radius: 12px;">
+                    <div class="centered"><h6 class="title-small">Mesačná spotreba:</h6><h6 class="value" id="mesacna-spotreba-2">0 kWh</h6></div>
+                    <div class="centered"><h6 class="title-small">Ročná spotreba:</h6><h6 class="value" id="rocna-spotreba-2">0 kWh</h6></div>
+                    <div class="centered"><h6 class="title-small">Ročná cena za el.:</h6><h6 class="value" id="rocna-cena-2">0 €</h6></div>
+                </div>
+                <br>
+                <div class="ct-div-block w-full results-grid-row bg-primary p-compact centered mb-compact rounded">
+                    <div class="result-box"><h6 class="ct-headline result-label">Veľkosť systému:</h6><h6 class="ct-headline color-white" id="velkost-2">0 kWp</h6></div>
+                    <div class="result-box"><h6 class="ct-headline result-label">Plocha:</h6><h6 class="ct-headline color-white" id="plocha-2">0 m²</h6></div>
+                    <div class="result-box" id="bateria-box-2" style="display: flex;"><h6 class="ct-headline result-label">Batéria:</h6><h6 class="ct-headline color-white" id="bateria-2">0 kWh</h6></div>
+                    <div class="result-box" style="background: rgba(0,0,0,0.2); border-radius: 10px;"><h6 class="ct-headline result-label" style="font-weight: 700;">Cena realizácie:</h6><h6 class="ct-headline color-white" id="cena-2">0 €</h6></div>
+                    <div class="result-box highlight-box"><h6 class="ct-headline result-label" style="font-weight: 700;">Návratnosť:</h6><h6 class="ct-headline color-white" id="navratnost-2">0 rokov</h6></div>
+                </div>
+                
+                <div class="price-note">
+                    <p>⚠️ <strong>Upozornenie:</strong> Ceny sú orientačné a líšia sa podľa použitého sortimentu, značky komponentov a náročnosti inštalácie.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="calc-panel" id="panel-asic">
+            <div class="ct-div-block w-full p-compact rounded-t" style="padding-bottom: 0;">
+                <div class="ct-div-block w-full centered">
+                    <h3 class="ct-headline mb-compact mt-compact text-white">KALKULAČKA S ASIC MINEROM</h3>
+                </div>
+            </div>
+            <div class="ct-div-block w-full rounded-b p-compact">
+                <div class="calc-description">
+                    <h4>⛏️ Využitie prebytkov na ťažbu kryptomien</h4>
+                    <p>ASIC miner využije prebytkovú energiu na ťažbu Bitcoinu a výrazne skráti dobu návratnosti.</p>
+                </div>
+                
+                <div class="calculator">
+                    <label class="input-label">Typ strechy?</label>
+                    <div class="choose-gender">
+                        <div class="segmented-control">
+                            <input id="typ-strechy-plocha-3" type="radio" name="typ-strechy-3" value="plocha">
+                            <label for="typ-strechy-plocha-3">Plochá</label>
+                        </div>
+                        <div class="segmented-control">
+                            <input id="typ-strechy-sedlova-3" type="radio" name="typ-strechy-3" value="sedlova" checked>
+                            <label for="typ-strechy-sedlova-3">Sedlová (šikmá 15°-35°)</label>
+                        </div>
+                    </div>
+                    
+                    <label class="input-label" for="mesacny-ucet-slider-3">Mesačný účet za elektrinu (€):</label>
+                    <input id="mesacny-ucet-slider-3" type="range" value="60" min="50" max="300" step="5">
+                    <div class="manual-input-wrapper">
+                        <input type="number" id="mesacny-ucet-input-3" class="manual-input-field" value="60" min="0">
+                        <span class="currency-symbol">€</span>
+                    </div>
+                    
+                    <div class="asic-section">
+                        <div class="asic-checkbox-wrapper" onclick="document.getElementById('asic-check-3').click(); event.stopPropagation();">
+                            <input type="checkbox" id="asic-check-3" class="custom-checkbox asic-checkbox" checked onclick="event.stopPropagation();">
+                            <label for="asic-check-3" class="asic-label" onclick="event.stopPropagation();">⛏️ Chcem využiť prebytky na ťažbu kryptomien</label>
+                        </div>
+                        <div id="asic-options-3" class="asic-options visible">
+                            <div class="asic-card selected" id="asic-mini3-3" onclick="selectAsic3('mini3')">
+                                <img src="https://braiins.com/images/pool/partners/logos/BitAxe_logo.png" alt="Bitaxe">
+                                <h4>Bitaxe Supra</h4>
+                                <div class="asic-for">Pre systémy do 8 kWp</div>
+                                <a href="https://minero.sk" target="_blank" class="asic-link" onclick="event.stopPropagation();">minero.sk</a>
+                            </div>
+                            <div class="asic-card" id="asic-avalonq-3" onclick="selectAsic3('avalonq')">
+                                <img src="https://canaan.io/images/avalon-mini-3.png" alt="Avalon">
+                                <h4>Avalon Nano 3 / Mini 3</h4>
+                                <div class="asic-for">Pre systémy nad 8 kWp</div>
+                                <a href="https://minero.sk" target="_blank" class="asic-link" onclick="event.stopPropagation();">minero.sk</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="results ct-div-block w-full grid grid-cols-3 gap-compact p-compact centered" style="background: rgba(255,255,255,0.03); border-radius: 12px;">
+                    <div class="centered"><h6 class="title-small">Mesačná spotreba:</h6><h6 class="value" id="mesacna-spotreba-3">0 kWh</h6></div>
+                    <div class="centered"><h6 class="title-small">Ročná spotreba:</h6><h6 class="value" id="rocna-spotreba-3">0 kWh</h6></div>
+                    <div class="centered"><h6 class="title-small">Ročná cena za el.:</h6><h6 class="value" id="rocna-cena-3">0 €</h6></div>
+                </div>
+                <br>
+                <div class="ct-div-block w-full results-grid-row bg-primary p-compact centered mb-compact rounded">
+                    <div class="result-box"><h6 class="ct-headline result-label">Veľkosť systému:</h6><h6 class="ct-headline color-white" id="velkost-3">0 kWp</h6></div>
+                    <div class="result-box"><h6 class="ct-headline result-label">Plocha:</h6><h6 class="ct-headline color-white" id="plocha-3">0 m²</h6></div>
+                    <div class="result-box" style="background: rgba(0,0,0,0.2); border-radius: 10px;"><h6 class="ct-headline result-label" style="font-weight: 700;">Cena realizácie:</h6><h6 class="ct-headline color-white" id="cena-3">0 €</h6></div>
+                    <div class="result-box highlight-box"><h6 class="ct-headline result-label" style="font-weight: 700;">Návratnosť:</h6><h6 class="ct-headline color-white" id="navratnost-3">0 rokov</h6></div>
+                </div>
+                
+                <div class="price-note">
+                    <p>⚠️ <strong>Upozornenie:</strong> Ceny sú orientačné. Príjem z ťažby závisí od aktuálnej ceny Bitcoinu a náročnosti siete.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="calc-panel" id="panel-kombinovana">
+            <div class="ct-div-block w-full p-compact rounded-t" style="padding-bottom: 0;">
+                <div class="ct-div-block w-full centered">
+                    <h3 class="ct-headline mb-compact mt-compact text-white">BATÉRIA + ASIC MINER</h3>
+                </div>
+            </div>
+            <div class="ct-div-block w-full rounded-b p-compact">
+                <div class="calc-description">
+                    <h4>🔋⛏️ Kombinácia batérie a ASIC minera</h4>
+                    <p>Maximálna sebestačnosť s batériou + pasívny príjem z ťažby kryptomien.</p>
+                </div>
+                
+                <div class="calculator">
+                    <label class="input-label">Typ strechy?</label>
+                    <div class="choose-gender">
+                        <div class="segmented-control">
+                            <input id="typ-strechy-plocha-4" type="radio" name="typ-strechy-4" value="plocha">
+                            <label for="typ-strechy-plocha-4">Plochá</label>
+                        </div>
+                        <div class="segmented-control">
+                            <input id="typ-strechy-sedlova-4" type="radio" name="typ-strechy-4" value="sedlova" checked>
+                            <label for="typ-strechy-sedlova-4">Sedlová (šikmá 15°-35°)</label>
+                        </div>
+                    </div>
+                    
+                    <label class="input-label" for="mesacny-ucet-slider-4">Mesačný účet za elektrinu (€):</label>
+                    <input id="mesacny-ucet-slider-4" type="range" value="100" min="50" max="300" step="5">
+                    <div class="manual-input-wrapper">
+                        <input type="number" id="mesacny-ucet-input-4" class="manual-input-field" value="100" min="0">
+                        <span class="currency-symbol">€</span>
+                    </div>
+                    
+                    <div class="checkbox-wrapper" onclick="document.getElementById('bateria-check-4').click(); event.stopPropagation();">
+                        <input type="checkbox" id="bateria-check-4" class="custom-checkbox" checked onclick="event.stopPropagation();">
+                        <label for="bateria-check-4" class="checkbox-label" onclick="event.stopPropagation();">🔋 Chcem aj batériové úložisko</label>
+                    </div>
+                    
+                    <div class="asic-section">
+                        <div class="asic-checkbox-wrapper" onclick="document.getElementById('asic-check-4').click(); event.stopPropagation();">
+                            <input type="checkbox" id="asic-check-4" class="custom-checkbox asic-checkbox" checked onclick="event.stopPropagation();">
+                            <label for="asic-check-4" class="asic-label" onclick="event.stopPropagation();">⛏️ Chcem využiť prebytky na ťažbu kryptomien</label>
+                        </div>
+                        <div id="asic-options-4" class="asic-options visible">
+                            <div class="asic-card selected" id="asic-mini3-4" onclick="selectAsic4('mini3')">
+                                <img src="https://braiins.com/images/pool/partners/logos/BitAxe_logo.png" alt="Bitaxe">
+                                <h4>Bitaxe Supra</h4>
+                                <div class="asic-for">Pre systémy do 8 kWp</div>
+                                <a href="https://minero.sk" target="_blank" class="asic-link" onclick="event.stopPropagation();">minero.sk</a>
+                            </div>
+                            <div class="asic-card" id="asic-avalonq-4" onclick="selectAsic4('avalonq')">
+                                <img src="https://canaan.io/images/avalon-mini-3.png" alt="Avalon">
+                                <h4>Avalon Nano 3 / Mini 3</h4>
+                                <div class="asic-for">Pre systémy nad 8 kWp</div>
+                                <a href="https://minero.sk" target="_blank" class="asic-link" onclick="event.stopPropagation();">minero.sk</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="results ct-div-block w-full grid grid-cols-3 gap-compact p-compact centered" style="background: rgba(255,255,255,0.03); border-radius: 12px;">
+                    <div class="centered"><h6 class="title-small">Mesačná spotreba:</h6><h6 class="value" id="mesacna-spotreba-4">0 kWh</h6></div>
+                    <div class="centered"><h6 class="title-small">Ročná spotreba:</h6><h6 class="value" id="rocna-spotreba-4">0 kWh</h6></div>
+                    <div class="centered"><h6 class="title-small">Ročná cena za el.:</h6><h6 class="value" id="rocna-cena-4">0 €</h6></div>
+                </div>
+                <br>
+                <div class="ct-div-block w-full results-grid-row bg-primary p-compact centered mb-compact rounded">
+                    <div class="result-box"><h6 class="ct-headline result-label">Veľkosť systému:</h6><h6 class="ct-headline color-white" id="velkost-4">0 kWp</h6></div>
+                    <div class="result-box"><h6 class="ct-headline result-label">Plocha:</h6><h6 class="ct-headline color-white" id="plocha-4">0 m²</h6></div>
+                    <div class="result-box" id="bateria-box-4"><h6 class="ct-headline result-label">Batéria:</h6><h6 class="ct-headline color-white" id="bateria-4">0 kWh</h6></div>
+                    <div class="result-box" style="background: rgba(0,0,0,0.2); border-radius: 10px;"><h6 class="ct-headline result-label" style="font-weight: 700;">Cena realizácie:</h6><h6 class="ct-headline color-white" id="cena-4">0 €</h6></div>
+                    <div class="result-box highlight-box"><h6 class="ct-headline result-label" style="font-weight: 700;">Návratnosť:</h6><h6 class="ct-headline color-white" id="navratnost-4">0 rokov</h6></div>
+                </div>
+                
+                <div class="price-note">
+                    <p>⚠️ <strong>Upozornenie:</strong> Ceny sú orientačné. Príjem z ťažby závisí od aktuálnej ceny Bitcoinu.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="calc-panel" id="panel-dotacie">
+            <div class="ct-div-block w-full p-compact rounded-t" style="padding-bottom: 0;">
+                <div class="ct-div-block w-full centered">
+                    <h3 class="ct-headline mb-compact mt-compact text-white">KOMPLETNÁ KALKULAČKA + DOTÁCIE</h3>
+                </div>
+            </div>
+            <div class="ct-div-block w-full rounded-b p-compact">
+                <div class="calc-description">
+                    <h4>💰 Všetky možnosti vrátane štátnych dotácií</h4>
+                    <p>Najkomplexnejší výpočet so všetkými možnosťami a aktuálnymi dotáciami.</p>
+                </div>
+                
+                <div class="calculator">
+                    <label class="input-label">Typ strechy?</label>
+                    <div class="choose-gender">
+                        <div class="segmented-control">
+                            <input id="typ-strechy-plocha-5" type="radio" name="typ-strechy-5" value="plocha">
+                            <label for="typ-strechy-plocha-5">Plochá</label>
+                        </div>
+                        <div class="segmented-control">
+                            <input id="typ-strechy-sedlova-5" type="radio" name="typ-strechy-5" value="sedlova" checked>
+                            <label for="typ-strechy-sedlova-5">Sedlová (šikmá 15°-35°)</label>
+                        </div>
+                    </div>
+                    
+                    <label class="input-label" for="mesacny-ucet-slider-5">Mesačný účet za elektrinu (€):</label>
+                    <input id="mesacny-ucet-slider-5" type="range" value="100" min="50" max="300" step="5">
+                    <div class="manual-input-wrapper">
+                        <input type="number" id="mesacny-ucet-input-5" class="manual-input-field" value="100" min="0">
+                        <span class="currency-symbol">€</span>
+                    </div>
+                    
+                    <div class="checkbox-wrapper" onclick="document.getElementById('bateria-check-5').click(); event.stopPropagation();">
+                        <input type="checkbox" id="bateria-check-5" class="custom-checkbox" onclick="event.stopPropagation();">
+                        <label for="bateria-check-5" class="checkbox-label" onclick="event.stopPropagation();">🔋 Chcem aj batériové úložisko</label>
+                    </div>
+                    
+                    <div class="asic-section">
+                        <div class="asic-checkbox-wrapper" onclick="document.getElementById('asic-check-5').click(); event.stopPropagation();">
+                            <input type="checkbox" id="asic-check-5" class="custom-checkbox asic-checkbox" onclick="event.stopPropagation();">
+                            <label for="asic-check-5" class="asic-label" onclick="event.stopPropagation();">⛏️ Chcem využiť prebytky na ťažbu kryptomien</label>
+                        </div>
+                        <div id="asic-options-5" class="asic-options">
+                            <div class="asic-card selected" id="asic-mini3-5" onclick="selectAsic5('mini3')">
+                                <img src="https://braiins.com/images/pool/partners/logos/BitAxe_logo.png" alt="Bitaxe">
+                                <h4>Bitaxe Supra</h4>
+                                <div class="asic-for">Pre systémy do 8 kWp</div>
+                                <a href="https://minero.sk" target="_blank" class="asic-link" onclick="event.stopPropagation();">minero.sk</a>
+                            </div>
+                            <div class="asic-card" id="asic-avalonq-5" onclick="selectAsic5('avalonq')">
+                                <img src="https://canaan.io/images/avalon-mini-3.png" alt="Avalon">
+                                <h4>Avalon Nano 3 / Mini 3</h4>
+                                <div class="asic-for">Pre systémy nad 8 kWp</div>
+                                <a href="https://minero.sk" target="_blank" class="asic-link" onclick="event.stopPropagation();">minero.sk</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dotacie-section">
+                        <div class="dotacie-title">💰 Výber dotácie</div>
+                        <div class="dotacie-options">
+                            <div class="dotacie-option selected" onclick="selectDotacia('zelena')">
+                                <input type="radio" name="dotacia" class="dotacie-radio" value="zelena" checked>
+                                <div class="dotacie-content">
+                                    <h4>Zelená domácnostiam <span class="dotacie-badge">Odporúčané</span></h4>
+                                    <p>Dotácia až <span class="highlight">90%</span> z ceny systému (max. 14 500 €)</p>
+                                </div>
+                            </div>
+                            <div class="dotacie-option" onclick="selectDotacia('obnov')">
+                                <input type="radio" name="dotacia" class="dotacie-radio" value="obnov">
+                                <div class="dotacie-content">
+                                    <h4>Obnov dom</h4>
+                                    <p>Dotácia <span class="highlight">500 €/kWp</span> (max. 4 000 €)</p>
+                                </div>
+                            </div>
+                            <div class="dotacie-option" onclick="selectDotacia('bez')">
+                                <input type="radio" name="dotacia" class="dotacie-radio" value="bez">
+                                <div class="dotacie-content">
+                                    <h4>Bez dotácie</h4>
+                                    <p>Výpočet bez štátnej podpory</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="results ct-div-block w-full grid grid-cols-3 gap-compact p-compact centered" style="background: rgba(255,255,255,0.03); border-radius: 12px;">
+                    <div class="centered"><h6 class="title-small">Mesačná spotreba:</h6><h6 class="value" id="mesacna-spotreba-5">0 kWh</h6></div>
+                    <div class="centered"><h6 class="title-small">Ročná spotreba:</h6><h6 class="value" id="rocna-spotreba-5">0 kWh</h6></div>
+                    <div class="centered"><h6 class="title-small">Ročná cena za el.:</h6><h6 class="value" id="rocna-cena-5">0 €</h6></div>
+                </div>
+                <br>
+                <div class="ct-div-block w-full results-grid-row bg-primary p-compact centered mb-compact rounded">
+                    <div class="result-box"><h6 class="ct-headline result-label">Veľkosť systému:</h6><h6 class="ct-headline color-white" id="velkost-5">0 kWp</h6></div>
+                    <div class="result-box"><h6 class="ct-headline result-label">Plocha:</h6><h6 class="ct-headline color-white" id="plocha-5">0 m²</h6></div>
+                    <div class="result-box" id="bateria-box-5" style="display: none;"><h6 class="ct-headline result-label">Batéria:</h6><h6 class="ct-headline color-white" id="bateria-5">0 kWh</h6></div>
+                    <div class="result-box" style="background: rgba(0,0,0,0.2); border-radius: 10px;"><h6 class="ct-headline result-label" style="font-weight: 700;">Cena realizácie:</h6><h6 class="ct-headline color-white" id="cena-5">0 €</h6></div>
+                    <div class="result-box highlight-box"><h6 class="ct-headline result-label" style="font-weight: 700;">Návratnosť:</h6><h6 class="ct-headline color-white" id="navratnost-5">0 rokov</h6></div>
+                </div>
+                
+                <div class="price-note">
+                    <p>⚠️ <strong>Upozornenie:</strong> Ceny a dotácie sú orientačné. Skutočná výška dotácie závisí od aktuálnych podmienok programu.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ct-div-block w-full rounded p-compact" style="background: var(--bg-secondary); margin-top: 2rem;">
+            <div class="centered mb-compact">
+                <h4 class="ct-headline mb-compact">Mali by ste záujem o nezáväznú cenovú ponuku?</h4>
+                <div class="ct-text-block mb-compact" style="color: var(--text-secondary); font-size: 1.1rem;">Vyplňte údaje a budeme vás kontaktovať!</div>
+            </div>
+            <div class="fluentform">
+                <form id="solar-contact-form">
+                    <div class="grid lg-grid-cols-2 gap-compact">
+                        <div class="ff-el-group">
+                            <label class="contact-label">Meno *</label>
+                            <input type="text" class="ff-el-form-control" placeholder="Ján" required>
+                        </div>
+                        <div class="ff-el-group">
+                            <label class="contact-label">Priezvisko *</label>
+                            <input type="text" class="ff-el-form-control" placeholder="Novák" required>
+                        </div>
+                    </div>
+                    <div class="grid lg-grid-cols-2 gap-compact">
+                        <div class="ff-el-group">
+                            <label class="contact-label">Telefón *</label>
+                            <input type="tel" class="ff-el-form-control" placeholder="+421 9xx xxx xxx" required>
+                        </div>
+                        <div class="ff-el-group">
+                            <label class="contact-label">E-mail *</label>
+                            <input type="email" class="ff-el-form-control" placeholder="email@domena.sk" required>
+                        </div>
+                    </div>
+                    <div class="ff-el-group">
+                        <label class="contact-label">Kedy chcete fotovoltiku realizovať? *</label>
+                        <select id="termin-realizacie" class="custom-select" style="margin-bottom: 0;" required>
+                            <option value="1_mesiac">Do 1 mesiaca</option>
+                            <option value="3_6_mesiacov">3-6 mesiacov</option>
+                            <option value="12_mesiacov">Do 12 mesiacov</option>
+                            <option value="iba_skusam">Iba skúšam kalkulačku</option>
+                        </select>
+                    </div>
+                    <button class="ff-btn ff-btn-submit" type="submit">Odoslať žiadosť</button>
+                </form>
+            </div>
+        </div>
+        
+        <a href="index.html" class="home-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            Späť na domovskú stránku
+        </a>
+    </div>
+    
+    <script>
+        // ==================== KONŠTANTY ====================
+        const CONSTANTS = {
+            PRICE_PER_KWH: 0.19,
+            PANEL_POWER: 0.425,
+            PANEL_AREA: 2.0,
+            PRICE_PER_KWP_BASE: 1150,
+            PRODUCTION_RATIO: 1100,
+            BASE_INSTALLATION_COST: 500,
+            PRICE_PER_KWP: 1000,
+            BATTERY_PRICE_PER_KWH: 400,
+            ASIC_INCOME_MINI: 400,
+            ASIC_INCOME_Q: 1000
+        };
+        
+        const DOTACIE = {
+            zelena: { percent: 0.9, max: 14500 },
+            obnov: { rate: 500, max: 4000 },
+            bez: { rate: 0, max: 0 }
+        };
+        
+        // ==================== GLOBÁLNE PREMENNÉ ====================
+        let selectedAsic3 = 'mini3';
+        let selectedAsic4 = 'mini3';
+        let selectedAsic5 = 'mini3';
+        let selectedDotacia = 'zelena';
+        
+        // ==================== TAB NAVIGATION ====================
+        document.querySelectorAll('.calc-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.calc-panel').forEach(p => p.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById('panel-' + this.dataset.tab).classList.add('active');
+            });
+        });
+        
+        // ==================== POMOCNÉ FUNKCIE ====================
+        function formatMoney(amount) {
+            return Math.round(amount).toLocaleString('sk-SK') + " €";
+        }
+        
+        // ==================== KALKULAČKA 1: ZÁKLADNÁ ====================
+        function calculate1() {
+            const monthlyBill = parseInt(document.getElementById('mesacny-ucet-input-1').value) || 0;
+            
+            const annualCost = monthlyBill * 12;
+            const annualCons = annualCost / CONSTANTS.PRICE_PER_KWH;
+            const monthlyCons = annualCons / 12;
+            
+            let neededKwp = annualCons / CONSTANTS.PRODUCTION_RATIO;
+            let panels = Math.ceil(neededKwp / CONSTANTS.PANEL_POWER);
+            if (panels < 4 && monthlyBill > 0) panels = 4;
+            if (monthlyBill === 0) panels = 0;
+            
+            const systemSize = panels * CONSTANTS.PANEL_POWER;
+            const area = panels * CONSTANTS.PANEL_AREA;
+            
+            let priceMultiplier = systemSize > 8 ? 1000 : (systemSize > 5 ? 1100 : CONSTANTS.PRICE_PER_KWP_BASE);
+            let price = Math.ceil((systemSize * priceMultiplier) / 100) * 100;
+            
+            const yearlySavings = annualCost * 0.7;
+            const payback = yearlySavings > 0 ? (price / yearlySavings) : 0;
+            
+            document.getElementById('mesacna-spotreba-1').textContent = Math.round(monthlyCons) + " kWh";
+            document.getElementById('rocna-spotreba-1').textContent = Math.round(annualCons) + " kWh";
+            document.getElementById('rocna-cena-1').textContent = annualCost + " €";
+            document.getElementById('velkost-1').textContent = systemSize.toFixed(2) + " kWp";
+            document.getElementById('plocha-1').textContent = area.toFixed(1) + " m²";
+            document.getElementById('cena-1').textContent = formatMoney(price);
+            document.getElementById('navratnost-1').textContent = payback.toFixed(1) + " rokov";
+        }
+        
+        // ==================== KALKULAČKA 2: S BATÉRIOU ====================
+        function calculate2() {
+            const monthlyBill = parseInt(document.getElementById('mesacny-ucet-input-2').value) || 0;
+            const hasBattery = document.getElementById('bateria-check-2').checked;
+            
+            const annualCost = monthlyBill * 12;
+            const annualCons = annualCost / CONSTANTS.PRICE_PER_KWH;
+            const monthlyCons = annualCons / 12;
+            
+            let neededKwp = annualCons / CONSTANTS.PRODUCTION_RATIO;
+            let panels = Math.ceil(neededKwp / CONSTANTS.PANEL_POWER);
+            if (panels < 4 && monthlyBill > 0) panels = 4;
+            if (monthlyBill === 0) panels = 0;
+            
+            const systemSize = panels * CONSTANTS.PANEL_POWER;
+            const area = panels * CONSTANTS.PANEL_AREA;
+            
+            let batterySize = 0;
+            if (hasBattery) {
+                batterySize = Math.ceil(systemSize);
+                if (batterySize < 5 && systemSize > 0) batterySize = 5;
+                document.getElementById('bateria-box-2').style.display = 'flex';
+                document.getElementById('bateria-2').textContent = batterySize + " kWh";
+            } else {
+                document.getElementById('bateria-box-2').style.display = 'none';
+            }
+            
+            let price = CONSTANTS.BASE_INSTALLATION_COST + (systemSize * CONSTANTS.PRICE_PER_KWP);
+            if (hasBattery) price += batterySize * CONSTANTS.BATTERY_PRICE_PER_KWH;
+            price = Math.ceil(price / 100) * 100;
+            if (systemSize === 0) price = 0;
+            
+            const savingRatio = hasBattery ? 0.85 : 0.70;
+            const yearlySavings = annualCost * savingRatio;
+            const payback = yearlySavings > 0 ? (price / yearlySavings) : 0;
+            
+            document.getElementById('mesacna-spotreba-2').textContent = Math.round(monthlyCons) + " kWh";
+            document.getElementById('rocna-spotreba-2').textContent = Math.round(annualCons) + " kWh";
+            document.getElementById('rocna-cena-2').textContent = annualCost + " €";
+            document.getElementById('velkost-2').textContent = systemSize.toFixed(2) + " kWp";
+            document.getElementById('plocha-2').textContent = area.toFixed(1) + " m²";
+            document.getElementById('cena-2').textContent = formatMoney(price);
+            document.getElementById('navratnost-2').textContent = payback.toFixed(1) + " rokov";
+        }
+        
+        // ==================== KALKULAČKA 3: S ASIC ====================
+        function selectAsic3(type) {
+            const monthlyBill = parseInt(document.getElementById('mesacny-ucet-input-3').value) || 0;
+            if (type === 'avalonq' && monthlyBill < 145) return;
+            
+            selectedAsic3 = type;
+            document.getElementById('asic-mini3-3').classList.remove('selected');
+            document.getElementById('asic-avalonq-3').classList.remove('selected');
+            document.getElementById('asic-' + type + '-3').classList.add('selected');
+            calculate3();
+        }
+        
+        function checkAsicAvailability3() {
+            const monthlyBill = parseInt(document.getElementById('mesacny-ucet-input-3').value) || 0;
+            if (monthlyBill < 145) {
+                document.getElementById('asic-avalonq-3').classList.add('disabled');
+                if (selectedAsic3 !== 'mini3') selectAsic3('mini3');
+            } else {
+                document.getElementById('asic-avalonq-3').classList.remove('disabled');
+            }
+        }
+        
+        function calculate3() {
+            checkAsicAvailability3();
+            
+            const monthlyBill = parseInt(document.getElementById('mesacny-ucet-input-3').value) || 0;
+            const hasAsic = document.getElementById('asic-check-3').checked;
+            
+            const annualCost = monthlyBill * 12;
+            const annualCons = annualCost / CONSTANTS.PRICE_PER_KWH;
+            const monthlyCons = annualCons / 12;
+            
+            let neededKwp = annualCons / CONSTANTS.PRODUCTION_RATIO;
+            let panels = Math.ceil(neededKwp / CONSTANTS.PANEL_POWER);
+            if (panels < 4 && monthlyBill > 0) panels = 4;
+            if (monthlyBill === 0) panels = 0;
+            
+            const systemSize = panels * CONSTANTS.PANEL_POWER;
+            const area = panels * CONSTANTS.PANEL_AREA;
+            
+            let price = CONSTANTS.BASE_INSTALLATION_COST + (systemSize * CONSTANTS.PRICE_PER_KWP);
+            price = Math.ceil(price / 100) * 100;
+            if (systemSize === 0) price = 0;
+            
+            let yearlySavings = annualCost * 0.70;
+            let payback = 0;
+            
+            if (hasAsic) {
+                const asicIncome = selectedAsic3 === 'mini3' ? CONSTANTS.ASIC_INCOME_MINI : CONSTANTS.ASIC_INCOME_Q;
+                const totalIncome = yearlySavings + asicIncome;
+                payback = totalIncome > 0 ? (price / totalIncome) : 0;
+            } else {
+                payback = yearlySavings > 0 ? (price / yearlySavings) : 0;
+            }
+            
+            document.getElementById('mesacna-spotreba-3').textContent = Math.round(monthlyCons) + " kWh";
+            document.getElementById('rocna-spotreba-3').textContent = Math.round(annualCons) + " kWh";
+            document.getElementById('rocna-cena-3').textContent = annualCost + " €";
+            document.getElementById('velkost-3').textContent = systemSize.toFixed(2) + " kWp";
+            document.getElementById('plocha-3').textContent = area.toFixed(1) + " m²";
+            document.getElementById('cena-3').textContent = formatMoney(price);
+            document.getElementById('navratnost-3').textContent = payback.toFixed(1) + " rokov";
+        }
+        
+        // ==================== KALKULAČKA 4: BATÉRIA + MINER ====================
+        function selectAsic4(type) {
+            const monthlyBill = parseInt(document.getElementById('mesacny-ucet-input-4').value) || 0;
+            if (type === 'avalonq' && monthlyBill < 145) return;
+            
+            selectedAsic4 = type;
+            document.getElementById('asic-mini3-4').classList.remove('selected');
+            document.getElementById('asic-avalonq-4').classList.remove('selected');
+            document.getElementById('asic-' + type + '-4').classList.add('selected');
+            calculate4();
+        }
+        
+        function checkAsicAvailability4() {
+            const monthlyBill = parseInt(document.getElementById('mesacny-ucet-input-4').value) || 0;
+            if (monthlyBill < 145) {
+                document.getElementById('asic-avalonq-4').classList.add('disabled');
+                if (selectedAsic4 !== 'mini3') selectAsic4('mini3');
+            } else {
+                document.getElementById('asic-avalonq-4').classList.remove('disabled');
+            }
+        }
+        
+        function calculate4() {
+            checkAsicAvailability4();
+            
+            const monthlyBill = parseInt(document.getElementById('mesacny-ucet-input-4').value) || 0;
+            const hasBattery = document.getElementById('bateria-check-4').checked;
+            const hasAsic = document.getElementById('asic-check-4').checked;
+            
+            const annualCost = monthlyBill * 12;
+            const annualCons = annualCost / CONSTANTS.PRICE_PER_KWH;
+            const monthlyCons = annualCons / 12;
+            
+            let neededKwp = annualCons / CONSTANTS.PRODUCTION_RATIO;
+            let panels = Math.ceil(neededKwp / CONSTANTS.PANEL_POWER);
+            if (panels < 4 && monthlyBill > 0) panels = 4;
+            if (monthlyBill === 0) panels = 0;
+            
+            const systemSize = panels * CONSTANTS.PANEL_POWER;
+            const area = panels * CONSTANTS.PANEL_AREA;
+            
+            let batterySize = 0;
+            if (hasBattery) {
+                batterySize = Math.ceil(systemSize / 5) * 5;
+                if (batterySize < 5) batterySize = 5;
+                document.getElementById('bateria-box-4').style.display = 'flex';
+                document.getElementById('bateria-4').textContent = batterySize + " kWh";
+            } else {
+                document.getElementById('bateria-box-4').style.display = 'none';
+            }
+            
+            let price = CONSTANTS.BASE_INSTALLATION_COST + (systemSize * CONSTANTS.PRICE_PER_KWP);
+            if (hasBattery) price += batterySize * CONSTANTS.BATTERY_PRICE_PER_KWH;
+            price = Math.ceil(price / 100) * 100;
+            if (systemSize === 0) price = 0;
+            
+            const savingRatio = hasBattery ? 0.90 : 0.70;
+            let yearlySavings = annualCost * savingRatio;
+            let payback = 0;
+            
+            if (hasAsic) {
+                const asicIncome = selectedAsic4 === 'mini3' ? CONSTANTS.ASIC_INCOME_MINI : CONSTANTS.ASIC_INCOME_Q;
+                const totalIncome = yearlySavings + asicIncome;
+                payback = totalIncome > 0 ? (price / totalIncome) : 0;
+            } else {
+                payback = yearlySavings > 0 ? (price / yearlySavings) : 0;
+            }
+            
+            document.getElementById('mesacna-spotreba-4').textContent = Math.round(monthlyCons) + " kWh";
+            document.getElementById('rocna-spotreba-4').textContent = Math.round(annualCons) + " kWh";
+            document.getElementById('rocna-cena-4').textContent = annualCost + " €";
+            document.getElementById('velkost-4').textContent = systemSize.toFixed(2) + " kWp";
+            document.getElementById('plocha-4').textContent = area.toFixed(1) + " m²";
+            document.getElementById('cena-4').textContent = formatMoney(price);
+            document.getElementById('navratnost-4').textContent = payback.toFixed(1) + " rokov";
+        }
+        
+        // ==================== KALKULAČKA 5: KOMPLETNÁ + DOTÁCIE ====================
+        function selectAsic5(type) {
+            const monthlyBill = parseInt(document.getElementById('mesacny-ucet-input-5').value) || 0;
+            if (type === 'avalonq' && monthlyBill < 145) return;
+            
+            selectedAsic5 = type;
+            document.getElementById('asic-mini3-5').classList.remove('selected');
+            document.getElementById('asic-avalonq-5').classList.remove('selected');
+            document.getElementById('asic-' + type + '-5').classList.add('selected');
+            calculate5();
+        }
+        
+        function checkAsicAvailability5() {
+            const monthlyBill = parseInt(document.getElementById('mesacny-ucet-input-5').value) || 0;
+            if (monthlyBill < 145) {
+                document.getElementById('asic-avalonq-5').classList.add('disabled');
+                if (selectedAsic5 !== 'mini3') selectAsic5('mini3');
+            } else {
+                document.getElementById('asic-avalonq-5').classList.remove('disabled');
+            }
+        }
+        
+        function selectDotacia(type) {
+            selectedDotacia = type;
+            document.querySelectorAll('.dotacie-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelectorAll('.dotacie-radio').forEach(radio => radio.checked = false);
+            
+            const selectedOption = document.querySelector(`.dotacie-option input[value="${type}"]`);
+            if (selectedOption) {
+                selectedOption.checked = true;
+                selectedOption.closest('.dotacie-option').classList.add('selected');
+            }
+            calculate5();
+        }
+        
+        function calculate5() {
+            checkAsicAvailability5();
+            
+            const monthlyBill = parseInt(document.getElementById('mesacny-ucet-input-5').value) || 0;
+            const hasBattery = document.getElementById('bateria-check-5').checked;
+            const hasAsic = document.getElementById('asic-check-5').checked;
+            
+            const annualCost = monthlyBill * 12;
+            const annualCons = annualCost / CONSTANTS.PRICE_PER_KWH;
+            const monthlyCons = annualCons / 12;
+            
+            let neededKwp = annualCons / CONSTANTS.PRODUCTION_RATIO;
+            let panels = Math.ceil(neededKwp / CONSTANTS.PANEL_POWER);
+            if (panels < 4 && monthlyBill > 0) panels = 4;
+            if (monthlyBill === 0) panels = 0;
+            
+            const systemSize = panels * CONSTANTS.PANEL_POWER;
+            const area = panels * CONSTANTS.PANEL_AREA;
+            const systemSizeForDotacia = Math.min(systemSize, 10);
+            
+            let batterySize = 0;
+            if (hasBattery) {
+                batterySize = Math.ceil(systemSize / 5) * 5;
+                if (batterySize < 5) batterySize = 5;
+                document.getElementById('bateria-box-5').style.display = 'flex';
+                document.getElementById('bateria-5').textContent = batterySize + " kWh";
+            } else {
+                document.getElementById('bateria-box-5').style.display = 'none';
+            }
+            
+            let priceMultiplier = systemSize > 8 ? 1000 : (systemSize > 5 ? 1100 : CONSTANTS.PRICE_PER_KWP_BASE);
+            let price = systemSize * priceMultiplier;
+            if (hasBattery) price += batterySize * CONSTANTS.BATTERY_PRICE_PER_KWH;
+            price = Math.ceil(price / 100) * 100;
+            
+            // Dotácia
+            let dotaciaSuma = 0;
+            const dotaciaParams = DOTACIE[selectedDotacia];
+            
+            if (selectedDotacia === 'zelena') {
+                const fvPrice = systemSizeForDotacia * priceMultiplier;
+                dotaciaSuma = Math.min(Math.round(fvPrice * dotaciaParams.percent), dotaciaParams.max);
+            } else if (selectedDotacia === 'obnov') {
+                dotaciaSuma = Math.min(systemSizeForDotacia * dotaciaParams.rate, dotaciaParams.max);
+            }
+            
+            const priceAfterSubsidy = Math.max(0, price - dotaciaSuma);
+            
+            const savingRatio = hasBattery ? 0.85 : 0.70;
+            let yearlySavings = annualCost * savingRatio;
+            
+            let totalYearlyIncome = yearlySavings;
+            if (hasAsic && systemSize > 0) {
+                const asicIncome = selectedAsic5 === 'mini3' ? CONSTANTS.ASIC_INCOME_MINI : CONSTANTS.ASIC_INCOME_Q;
+                totalYearlyIncome += asicIncome;
+            }
+            
+            const payback = totalYearlyIncome > 0 ? (priceAfterSubsidy / totalYearlyIncome) : 0;
+            
+            document.getElementById('mesacna-spotreba-5').textContent = Math.round(monthlyCons) + " kWh";
+            document.getElementById('rocna-spotreba-5').textContent = Math.round(annualCons) + " kWh";
+            document.getElementById('rocna-cena-5').textContent = annualCost + " €";
+            document.getElementById('velkost-5').textContent = systemSize.toFixed(2) + " kWp";
+            document.getElementById('plocha-5').textContent = area.toFixed(1) + " m²";
+            document.getElementById('cena-5').textContent = formatMoney(price);
+            document.getElementById('navratnost-5').textContent = payback.toFixed(1) + " rokov";
+        }
+        
+        // ==================== EVENT LISTENERS ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kalkulačka 1
+            const slider1 = document.getElementById('mesacny-ucet-slider-1');
+            const input1 = document.getElementById('mesacny-ucet-input-1');
+            slider1.addEventListener('input', () => { input1.value = slider1.value; calculate1(); });
+            input1.addEventListener('input', () => { if (input1.value >= 50 && input1.value <= 300) slider1.value = input1.value; calculate1(); });
+            
+            // Kalkulačka 2
+            const slider2 = document.getElementById('mesacny-ucet-slider-2');
+            const input2 = document.getElementById('mesacny-ucet-input-2');
+            slider2.addEventListener('input', () => { input2.value = slider2.value; calculate2(); });
+            input2.addEventListener('input', () => { if (input2.value >= 50 && input2.value <= 300) slider2.value = input2.value; calculate2(); });
+            document.getElementById('bateria-check-2').addEventListener('change', calculate2);
+            
+            // Kalkulačka 3
+            const slider3 = document.getElementById('mesacny-ucet-slider-3');
+            const input3 = document.getElementById('mesacny-ucet-input-3');
+            slider3.addEventListener('input', () => { input3.value = slider3.value; calculate3(); });
+            input3.addEventListener('input', () => { if (input3.value >= 50 && input3.value <= 300) slider3.value = input3.value; calculate3(); });
+            document.getElementById('asic-check-3').addEventListener('change', function() {
+                document.getElementById('asic-options-3').classList.toggle('visible', this.checked);
+                calculate3();
+            });
+            
+            // Kalkulačka 4
+            const slider4 = document.getElementById('mesacny-ucet-slider-4');
+            const input4 = document.getElementById('mesacny-ucet-input-4');
+            slider4.addEventListener('input', () => { input4.value = slider4.value; calculate4(); });
+            input4.addEventListener('input', () => { if (input4.value >= 50 && input4.value <= 300) slider4.value = input4.value; calculate4(); });
+            document.getElementById('bateria-check-4').addEventListener('change', calculate4);
+            document.getElementById('asic-check-4').addEventListener('change', function() {
+                document.getElementById('asic-options-4').classList.toggle('visible', this.checked);
+                calculate4();
+            });
+            
+            // Kalkulačka 5
+            const slider5 = document.getElementById('mesacny-ucet-slider-5');
+            const input5 = document.getElementById('mesacny-ucet-input-5');
+            slider5.addEventListener('input', () => { input5.value = slider5.value; calculate5(); });
+            input5.addEventListener('input', () => { if (input5.value >= 50 && input5.value <= 300) slider5.value = input5.value; calculate5(); });
+            document.getElementById('bateria-check-5').addEventListener('change', calculate5);
+            document.getElementById('asic-check-5').addEventListener('change', function() {
+                document.getElementById('asic-options-5').classList.toggle('visible', this.checked);
+                calculate5();
+            });
+            
+            // Formulár
+            document.getElementById('solar-contact-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const termin = document.getElementById('termin-realizacie').value;
+                alert(termin === 'iba_skusam' ? "Ďakujeme za vyskúšanie kalkulačky!" : "Ďakujeme! Vaša žiadosť bola odoslaná.");
+            });
+            
+            // Inicializácia
+            calculate1();
+            calculate2();
+            calculate3();
+            calculate4();
+            calculate5();
+        });
+    </script>
+</body>
+</html>
