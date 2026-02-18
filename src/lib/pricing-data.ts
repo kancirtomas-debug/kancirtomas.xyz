@@ -10,6 +10,14 @@ export const pricingData: PricingItem[] = [
     ],
   },
   {
+    type: "Klasická masáž s prvkami Športovej masáže",
+    durations: [
+      { minutes: 60, price: 45 },
+      { minutes: 90, price: 60 },
+      { minutes: 120, price: 90 },
+    ],
+  },
+  {
     type: "Klasická masáž s použitím Bankovej terapie",
     durations: [{ minutes: 60, price: 60 }],
   },

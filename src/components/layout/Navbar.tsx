@@ -8,11 +8,11 @@ import { motion, AnimatePresence } from "motion/react";
 const navLinks = [
   { href: "/", label: "Domov" },
   { href: "/O-mne", label: "O mne" },
-  { href: "/Rezervacny-system", label: "Rezervačný systém" },
+  { href: "/rezervacny-system", label: "Rezervačný systém" },
   { href: "/Cennik", label: "Cenník" },
-  { href: "/Vzdelanie", label: "Vzdelanie" },
-  { href: "/Recenzie", label: "Recenzie" },
-  { href: "/Kontakt", label: "Kontakt" },
+  { href: "/vzdelanie", label: "Vzdelanie" },
+  { href: "/recenzie", label: "Recenzie" },
+  { href: "/kontakt", label: "Kontakt" },
 ];
 
 export default function Navbar() {

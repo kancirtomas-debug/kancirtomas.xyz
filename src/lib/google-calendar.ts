@@ -3,49 +3,88 @@ import { TimeSlot } from "@/types";
 
 const TIMEZONE = "Europe/Bratislava";
 const BUFFER_MINUTES = 30;
+const START_HOUR = 8;
+const END_HOUR = 18;
 
 function getCalendarClient() {
+  let privateKey = process.env.GOOGLE_PRIVATE_KEY || "";
+
+  // Handle both escaped \\n (from .env files) and literal \n
+  if (privateKey.includes("\\n")) {
+    privateKey = privateKey.replace(/\\n/g, "\n");
+  }
+
+  // Strip surrounding quotes if present
+  if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
+    privateKey = privateKey.slice(1, -1);
+  }
+
   const auth = new google.auth.JWT({
     email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    key: privateKey,
     scopes: ["https://www.googleapis.com/auth/calendar"],
   });
 
   return google.calendar({ version: "v3", auth });
 }
 
-function generateDaySlots(date: string, durationMinutes: number): TimeSlot[] {
+interface BusyBlock {
+  start: number; // ms timestamp
+  end: number;   // ms timestamp (includes buffer)
+}
+
+/**
+ * Generates all possible start times for a given duration.
+ * Slots start every 30 minutes from START_HOUR.
+ * The slot must end by END_HOUR.
+ */
+function generateCandidateSlots(
+  date: string,
+  durationMinutes: number
+): TimeSlot[] {
   const slots: TimeSlot[] = [];
-  const startHour = 8;
-  const endHour = 18;
-  const durationHours = durationMinutes / 60;
+  const startMinutes = START_HOUR * 60;
+  const endMinutes = END_HOUR * 60;
 
-  for (let hour = startHour; hour + durationHours <= endHour; hour++) {
-    const startH = hour;
-    const endH = hour + durationHours;
-    const endHour2 = Math.floor(endH);
-    const endMin = Math.round((endH - endHour2) * 60);
+  for (let m = startMinutes; m + durationMinutes <= endMinutes; m += 30) {
+    const startH = Math.floor(m / 60);
+    const startM = m % 60;
+    const endTotalM = m + durationMinutes;
+    const endH = Math.floor(endTotalM / 60);
+    const endM = endTotalM % 60;
 
-    const start = `${date}T${startH.toString().padStart(2, "0")}:00:00+01:00`;
-    const end = `${date}T${endHour2.toString().padStart(2, "0")}:${endMin.toString().padStart(2, "0")}:00+01:00`;
+    const start = `${date}T${startH.toString().padStart(2, "0")}:${startM.toString().padStart(2, "0")}:00`;
+    const end = `${date}T${endH.toString().padStart(2, "0")}:${endM.toString().padStart(2, "0")}:00`;
+
     slots.push({ start, end, available: true });
   }
+
   return slots;
 }
 
-function isOverlapping(
-  slotStart: string,
-  slotEnd: string,
-  busyStart?: string | null,
-  busyEnd?: string | null
+/**
+ * Checks if a candidate slot (with its trailing buffer) collides with any busy block.
+ *
+ * A candidate occupies: [slotStart, slotEnd + BUFFER]
+ * A busy block occupies: [busyStart, busyEnd + BUFFER] (already computed)
+ *
+ * Collision = the candidate's full block overlaps any busy block.
+ */
+function hasCollision(
+  slotStartMs: number,
+  slotEndMs: number,
+  busyBlocks: BusyBlock[]
 ): boolean {
-  if (!busyStart || !busyEnd) return false;
-  const sStart = new Date(slotStart).getTime();
-  const sEnd = new Date(slotEnd).getTime();
-  const bStart = new Date(busyStart).getTime();
-  // Add 30-minute buffer after each booked event
-  const bEnd = new Date(busyEnd).getTime() + BUFFER_MINUTES * 60 * 1000;
-  return sStart < bEnd && sEnd > bStart;
+  // The candidate's full occupied range includes its own buffer
+  const candidateEnd = slotEndMs + BUFFER_MINUTES * 60 * 1000;
+
+  for (const busy of busyBlocks) {
+    // Two ranges overlap if: candidateStart < busyEnd AND candidateEnd > busyStart
+    if (slotStartMs < busy.end && candidateEnd > busy.start) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export async function getAvailableSlots(
@@ -55,39 +94,48 @@ export async function getAvailableSlots(
   const calendar = getCalendarClient();
   const calendarId = process.env.GOOGLE_CALENDAR_ID!;
 
-  const startOfDay = new Date(`${date}T00:00:00+01:00`);
-  const endOfDay = new Date(`${date}T23:59:59+01:00`);
+  const startOfDay = `${date}T00:00:00`;
+  const endOfDay = `${date}T23:59:59`;
+
+  const candidates = generateCandidateSlots(date, durationMinutes);
 
   try {
     const response = await calendar.events.list({
       calendarId,
-      timeMin: startOfDay.toISOString(),
-      timeMax: endOfDay.toISOString(),
+      timeMin: new Date(startOfDay + "+01:00").toISOString(),
+      timeMax: new Date(endOfDay + "+01:00").toISOString(),
       singleEvents: true,
       orderBy: "startTime",
       timeZone: TIMEZONE,
     });
 
-    const busySlots = response.data.items || [];
-    const allSlots = generateDaySlots(date, durationMinutes);
+    const events = response.data.items || [];
 
-    return allSlots.map((slot) => ({
-      ...slot,
-      available: !busySlots.some((busy) =>
-        isOverlapping(
-          slot.start,
-          slot.end,
-          busy.start?.dateTime,
-          busy.end?.dateTime
-        )
-      ),
-    }));
+    // Build busy blocks: each event occupies [start, end + 30min buffer]
+    const busyBlocks: BusyBlock[] = events
+      .filter((e) => e.start?.dateTime && e.end?.dateTime)
+      .map((e) => ({
+        start: new Date(e.start!.dateTime!).getTime(),
+        end:
+          new Date(e.end!.dateTime!).getTime() +
+          BUFFER_MINUTES * 60 * 1000,
+      }));
+
+    // Mark each candidate as available only if its full block
+    // (duration + buffer) fits without collision
+    return candidates.map((slot) => {
+      const slotStartMs = new Date(slot.start + "+01:00").getTime();
+      const slotEndMs = new Date(slot.end + "+01:00").getTime();
+
+      return {
+        ...slot,
+        available: !hasCollision(slotStartMs, slotEndMs, busyBlocks),
+      };
+    });
   } catch (error) {
     console.error("Google Calendar API error:", error);
-    // If the API call fails, return all slots as available
-    // so the user can still attempt to book
-    const allSlots = generateDaySlots(date, durationMinutes);
-    return allSlots;
+    // Return all slots as available on API failure
+    return candidates;
   }
 }
 
@@ -104,6 +152,14 @@ export async function createBooking(
   const calendar = getCalendarClient();
   const calendarId = process.env.GOOGLE_CALENDAR_ID!;
 
+  // Ensure timezone offset is present
+  const startWithTz = startTime.includes("+") || startTime.includes("Z")
+    ? startTime
+    : startTime + "+01:00";
+  const endWithTz = endTime.includes("+") || endTime.includes("Z")
+    ? endTime
+    : endTime + "+01:00";
+
   const event = await calendar.events.insert({
     calendarId,
     requestBody: {
@@ -117,8 +173,8 @@ export async function createBooking(
         `Zdravotný stav:`,
         zdravotnyStav,
       ].join("\n"),
-      start: { dateTime: startTime, timeZone: TIMEZONE },
-      end: { dateTime: endTime, timeZone: TIMEZONE },
+      start: { dateTime: startWithTz, timeZone: TIMEZONE },
+      end: { dateTime: endWithTz, timeZone: TIMEZONE },
     },
   });
 

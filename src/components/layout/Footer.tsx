@@ -4,7 +4,7 @@ const quickLinks = [
   { href: "/", label: "Domov" },
   { href: "/O-mne", label: "O mne" },
   { href: "/Cennik", label: "Cenník" },
-  { href: "/Kontakt", label: "Kontakt" },
+  { href: "/kontakt", label: "Kontakt" },
 ];
 
 export default function Footer() {

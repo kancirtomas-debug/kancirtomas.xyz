@@ -14,7 +14,6 @@ const massageTypeLabels: Record<string, string> = {
   bankova: "Klasická masáž s použitím Bankovej terapie",
   "makke-techniky": "Klasická masáž s prvkami Mäkkých techník",
 };
-
 function CalendarContent() {
   const searchParams = useSearchParams();
   const massageType = searchParams.get("type") || "klasicka";
@@ -33,9 +32,7 @@ function CalendarContent() {
       setSelectedSlot(null);
       setShowBooking(false);
       try {
-        const response = await fetch(
-          `/api/calendar/slots?date=${date}&duration=${safeDuration}`
-        );
+        const response = await fetch(`/api/calendar/slots?date=${date}&duration=${safeDuration}`);
         const data = await response.json();
         setSlots(data.slots || []);
       } catch {
@@ -46,7 +43,6 @@ function CalendarContent() {
     },
     [safeDuration]
   );
-
   const handleDateSelect = (date: string) => {
     setSelectedDate(date);
     fetchSlots(date);
@@ -62,9 +58,7 @@ function CalendarContent() {
   return (
     <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
       <ScrollReveal>
-        <h1 className="text-3xl md:text-4xl font-bold text-heading text-center mb-2">
-          Rezervácia
-        </h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-heading text-center mb-2">Rezervácia</h1>
         <div className="text-center mb-12">
           <span className="inline-block bg-primary/10 text-primary font-semibold px-4 py-2 rounded-full text-sm">
             {typeLabel} — {safeDuration} min
@@ -75,28 +69,14 @@ function CalendarContent() {
       {!showBooking ? (
         <div className="space-y-8">
           <ScrollReveal>
-            <CalendarView
-              onDateSelect={handleDateSelect}
-              selectedDate={selectedDate}
-            />
+            <CalendarView onDateSelect={handleDateSelect} selectedDate={selectedDate} />
           </ScrollReveal>
-
           <ScrollReveal delay={0.15}>
-            <TimeSlotPicker
-              slots={slots}
-              loading={loadingSlots}
-              selectedSlot={selectedSlot}
-              onSlotSelect={handleSlotSelect}
-            />
+            <TimeSlotPicker slots={slots} loading={loadingSlots} selectedSlot={selectedSlot} onSlotSelect={handleSlotSelect} />
           </ScrollReveal>
         </div>
       ) : selectedSlot ? (
-        <BookingConfirmation
-          slot={selectedSlot}
-          massageType={massageType}
-          duration={safeDuration}
-          onBack={() => setShowBooking(false)}
-        />
+        <BookingConfirmation slot={selectedSlot} massageType={massageType} duration={safeDuration} onBack={() => setShowBooking(false)} />
       ) : null}
     </section>
   );
@@ -104,13 +84,7 @@ function CalendarContent() {
 
 export default function ReservationCalendarPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-        </div>
-      }
-    >
+    <Suspense fallback={<div className="max-w-4xl mx-auto px-4 py-16 text-center"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" /></div>}>
       <CalendarContent />
     </Suspense>
   );

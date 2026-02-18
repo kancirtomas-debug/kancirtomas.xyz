@@ -7,6 +7,7 @@ import { pricingData } from "@/lib/pricing-data";
 
 const typeToId: Record<string, string> = {
   "Klasická masáž": "klasicka",
+  "Klasická masáž s prvkami Športovej masáže": "sportova",
   "Klasická masáž s použitím Bankovej terapie": "bankova",
   "Klasická masáž s prvkami Mäkkých techník": "makke-techniky",
 };
@@ -36,7 +37,7 @@ export default function PricingPage() {
                   {item.durations.map((d, j) => (
                     <Link
                       key={j}
-                      href={`/Rezervacny-kalendar?type=${massageId}&duration=${d.minutes}`}
+                      href={`/rezervacny-kalendar?type=${massageId}&duration=${d.minutes}`}
                     >
                       <motion.div
                         whileHover={{ scale: 1.05 }}

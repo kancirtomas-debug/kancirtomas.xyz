@@ -59,7 +59,7 @@ export default function AboutPage() {
       {/* CTA Button */}
       <ScrollReveal>
         <div className="text-center mt-12">
-          <Button href="/Kontakt">Kontaktujte ma</Button>
+          <Button href="/kontakt">Kontaktujte ma</Button>
         </div>
       </ScrollReveal>
     </section>

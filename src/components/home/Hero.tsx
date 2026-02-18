@@ -38,7 +38,7 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="mt-8"
           >
-            <Button href="/Rezervacny-system">Objednať sa</Button>
+            <Button href="/rezervacny-system">Objednať sa</Button>
           </motion.div>
         </div>
 
