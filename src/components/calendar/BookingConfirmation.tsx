@@ -46,6 +46,7 @@ export default function BookingConfirmation({
   const [status, setStatus] = useState<
     "idle" | "sending" | "success" | "error"
   >("idle");
+  const [errorMsg, setErrorMsg] = useState<string>("");
 
   const allFieldsFilled = Object.values(formData).every(
     (v) => v.trim() !== ""
@@ -83,9 +84,12 @@ export default function BookingConfirmation({
       if (data.success) {
         setStatus("success");
       } else {
+        setErrorMsg(data.details || data.error || "Unknown error");
         setStatus("error");
       }
-    } catch {
+    } catch (err: unknown) {
+      const e = err as { message?: string };
+      setErrorMsg(e.message || "Network error");
       setStatus("error");
     }
   }
@@ -265,6 +269,11 @@ export default function BookingConfirmation({
             className="text-red-600 font-medium mt-2"
           >
             Nastala chyba pri rezervácii. Skúste to prosím znova.
+            {errorMsg && (
+              <span className="block text-xs text-red-400 mt-1">
+                Debug: {errorMsg}
+              </span>
+            )}
           </motion.p>
         )}
       </form>

@@ -152,31 +152,47 @@ export async function createBooking(
   const calendar = getCalendarClient();
   const calendarId = process.env.GOOGLE_CALENDAR_ID!;
 
-  // Ensure timezone offset is present
-  const startWithTz = startTime.includes("+") || startTime.includes("Z")
-    ? startTime
-    : startTime + "+01:00";
-  const endWithTz = endTime.includes("+") || endTime.includes("Z")
-    ? endTime
-    : endTime + "+01:00";
+  // Strip any existing timezone offset — we rely on timeZone parameter only
+  const cleanStart = startTime.replace(/[+-]\d{2}:\d{2}$/, "").replace(/Z$/, "");
+  const cleanEnd = endTime.replace(/[+-]\d{2}:\d{2}$/, "").replace(/Z$/, "");
 
-  const event = await calendar.events.insert({
+  console.log("Creating booking:", {
     calendarId,
-    requestBody: {
-      summary: `Masáž - ${meno} ${priezvisko} (${massageType})`,
-      description: [
-        `Klient: ${meno} ${priezvisko}`,
-        `Adresa: ${adresa}`,
-        `Telefón: ${telefon}`,
-        `Typ masáže: ${massageType}`,
-        ``,
-        `Zdravotný stav:`,
-        zdravotnyStav,
-      ].join("\n"),
-      start: { dateTime: startWithTz, timeZone: TIMEZONE },
-      end: { dateTime: endWithTz, timeZone: TIMEZONE },
-    },
+    startTime: cleanStart,
+    endTime: cleanEnd,
+    serviceEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    hasPrivateKey: !!process.env.GOOGLE_PRIVATE_KEY,
+    privateKeyLength: (process.env.GOOGLE_PRIVATE_KEY || "").length,
   });
 
-  return event.data;
+  try {
+    const event = await calendar.events.insert({
+      calendarId,
+      requestBody: {
+        summary: `Masáž - ${meno} ${priezvisko} (${massageType})`,
+        description: [
+          `Klient: ${meno} ${priezvisko}`,
+          `Adresa: ${adresa}`,
+          `Telefón: ${telefon}`,
+          `Typ masáže: ${massageType}`,
+          ``,
+          `Zdravotný stav:`,
+          zdravotnyStav,
+        ].join("\n"),
+        start: { dateTime: cleanStart, timeZone: TIMEZONE },
+        end: { dateTime: cleanEnd, timeZone: TIMEZONE },
+      },
+    });
+
+    console.log("Booking created successfully:", event.data.id);
+    return event.data;
+  } catch (error: unknown) {
+    const err = error as { message?: string; code?: number; errors?: unknown[] };
+    console.error("Google Calendar API createBooking error:", {
+      message: err.message,
+      code: err.code,
+      errors: err.errors,
+    });
+    throw error;
+  }
 }

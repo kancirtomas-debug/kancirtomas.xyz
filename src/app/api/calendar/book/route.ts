@@ -43,10 +43,20 @@ export async function POST(request: NextRequest) {
     );
 
     return NextResponse.json({ success: true, eventId: event.id });
-  } catch (error) {
-    console.error("Booking error:", error);
+  } catch (error: unknown) {
+    const err = error as { message?: string; code?: number; errors?: unknown[]; response?: { data?: unknown } };
+    console.error("Booking error details:", {
+      message: err.message,
+      code: err.code,
+      errors: err.errors,
+      responseData: err.response?.data,
+    });
     return NextResponse.json(
-      { error: "Failed to create booking" },
+      {
+        error: "Failed to create booking",
+        details: err.message || "Unknown error",
+        code: err.code,
+      },
       { status: 500 }
     );
   }
